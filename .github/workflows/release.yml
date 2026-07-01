@@ -54,6 +54,7 @@ jobs:
     environment: pypi
     permissions:
       id-token: write
+    continue-on-error: true
     steps:
       - name: Download distributions
         uses: actions/download-artifact@v4
