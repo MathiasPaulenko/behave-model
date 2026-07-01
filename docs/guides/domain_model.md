@@ -147,7 +147,7 @@ print(feature.location)      # <features/login.feature:1>
 | `location` | `Location` | Source location (filename, line) |
 | `comments` | `list[Comment]` | Comments in the feature file |
 
-## Rule :material-new-box: {: .md-tag }
+## Rule
 
 A Gherkin v6 `Rule` block that groups related scenarios within a Feature.
 

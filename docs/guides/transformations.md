@@ -50,35 +50,35 @@ add_tag_to_feature(project, "Login", "@regression")
 
 ## Sorting
 
-=== "Tags"
+**Tags:**
 
-    ```python
-    from behave_model import sort_tags
+```python
+from behave_model import sort_tags
 
-    sort_tags(project)
-    # Tags are now alphabetically sorted in all features, rules, and scenarios
-    ```
+sort_tags(project)
+# Tags are now alphabetically sorted in all features, rules, and scenarios
+```
 
-=== "Features"
+**Features:**
 
-    ```python
-    from behave_model import sort_features
+```python
+from behave_model import sort_features
 
-    # Sort by name (default)
-    sort_features(project)
+# Sort by name (default)
+sort_features(project)
 
-    # Sort by filename
-    sort_features(project, key=lambda f: f.location.filename)
-    ```
+# Sort by filename
+sort_features(project, key=lambda f: f.location.filename)
+```
 
-=== "Scenarios"
+**Scenarios:**
 
-    ```python
-    from behave_model import sort_scenarios
+```python
+from behave_model import sort_scenarios
 
-    sort_scenarios(project)
-    # Scenarios are now sorted within each feature and rule
-    ```
+sort_scenarios(project)
+# Scenarios are now sorted within each feature and rule
+```
 
 ## Normalizing whitespace
 

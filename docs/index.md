@@ -1,8 +1,3 @@
----
-title: behave-model — The canonical object model for Behave projects
-description: Parse, query, transform, validate, and serialize Behave/Gherkin feature files with a clean Python API. Full Gherkin v6 Rules and Tag Expression v2 support.
----
-
 # behave-model
 
 **The canonical object model for [Behave](https://github.com/behave/behave) projects.**
@@ -11,39 +6,37 @@ description: Parse, query, transform, validate, and serialize Behave/Gherkin fea
 
 ---
 
-## :rocket: Key Features
+## Key Features
 
-- :material-language-python: **Clean domain model** — Pure dataclasses, no external runtime dependencies beyond Behave
-- :material-check-circle: **Compatible with Behave 1.3.x** — Tag Expression v2 and Gherkin v6 (including `Rule` blocks)
-- :material-graph: **Visitor pattern** — Traverse the entire tree with custom visitors (DFS & BFS)
-- :material-database-search: **Query API** — Find features, scenarios, steps, and tags by name, tag, or keyword
-- :material-code-json: **Serializers** — Dict, JSON, and pretty-printed Gherkin output
-- :material-swap-horizontal: **Transformations** — Safe in-place modifications (rename tags, sort, normalize)
-- :material-shield-check: **Validation framework** — Pluggable rules with built-in checks
-- :material-chart-bar: **Statistics** — Project metrics out of the box
-- :material-test-tube: **95% test coverage** — Comprehensive unit, integration, and golden file tests
-
----
-
-## :material-download: Installation
-
-=== :material-language-python: pip
-
-    ```bash
-    pip install behave-model
-    ```
-
-=== :material-source-repository: From source
-
-    ```bash
-    git clone https://github.com/MathiasPaulenko/behave-model.git
-    cd behave-model
-    pip install -e ".[dev]"
-    ```
+- **Clean domain model** — Pure dataclasses, no external runtime dependencies beyond Behave
+- **Compatible with Behave 1.3.x** — Tag Expression v2 and Gherkin v6 (including `Rule` blocks)
+- **Visitor pattern** — Traverse the entire tree with custom visitors (DFS & BFS)
+- **Query API** — Find features, scenarios, steps, and tags by name, tag, or keyword
+- **Serializers** — Dict, JSON, and pretty-printed Gherkin output
+- **Transformations** — Safe in-place modifications (rename tags, sort, normalize)
+- **Validation framework** — Pluggable rules with built-in checks
+- **Statistics** — Project metrics out of the box
+- **95% test coverage** — Comprehensive unit, integration, and golden file tests
 
 ---
 
-## :material-lightning-bolt: Quick Example
+## Installation
+
+```bash
+pip install behave-model
+```
+
+From source:
+
+```bash
+git clone https://github.com/MathiasPaulenko/behave-model.git
+cd behave-model
+pip install -e ".[dev]"
+```
+
+---
+
+## Quick Example
 
 ```python
 from behave_model import load_project
@@ -66,7 +59,7 @@ print(f"{stats['features']} features, {stats['scenarios']} scenarios")
 
 ---
 
-## :material-sitemap: Architecture at a Glance
+## Architecture at a Glance
 
 ```mermaid
 graph TD
@@ -84,7 +77,7 @@ Each layer has a single responsibility and can be used independently. Read the [
 
 ---
 
-## :material-book-open-variant: Documentation Sections
+## Documentation Sections
 
 | Section | Description |
 | --- | --- |
@@ -98,20 +91,20 @@ Each layer has a single responsibility and can be used independently. Read the [
 
 ---
 
-## :material-compatibility: Compatibility
+## Compatibility
 
 | Feature | Behave 1.3.x | behave-model |
 | --- | --- | --- |
-| Gherkin v6 `Rule` keyword | :material-check: | :material-check: |
-| Tag Expression v2 | :material-check: | :material-check: |
-| Scenario Outlines & Examples | :material-check: | :material-check: |
-| Data Tables | :material-check: | :material-check: |
-| DocStrings | :material-check: | :material-check: |
-| Backgrounds (Feature & Rule) | :material-check: | :material-check: |
-| Multi-language support | :material-check: | :material-check: |
+| Gherkin v6 `Rule` keyword | Yes | Yes |
+| Tag Expression v2 | Yes | Yes |
+| Scenario Outlines & Examples | Yes | Yes |
+| Data Tables | Yes | Yes |
+| DocStrings | Yes | Yes |
+| Backgrounds (Feature & Rule) | Yes | Yes |
+| Multi-language support | Yes | Yes |
 
 ---
 
-## :material-license: License
+## License
 
 MIT — see [LICENSE](https://github.com/MathiasPaulenko/behave-model/blob/main/LICENSE) for details.

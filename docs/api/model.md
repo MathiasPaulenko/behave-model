@@ -74,7 +74,7 @@ Represents a single `.feature` file.
 
 ---
 
-## Rule :material-new-box: {: .md-tag }
+## Rule
 
 A Gherkin v6 `Rule` block within a Feature.
 

@@ -57,34 +57,34 @@ for s in project.find_scenarios(name_contains="login"):
 
 ## 5. Serialize
 
-=== "JSON"
+**JSON:**
 
-    ```python
-    from behave_model import JsonSerializer
+```python
+from behave_model import JsonSerializer
 
-    json_text = JsonSerializer().serialize_project(project)
-    with open("project.json", "w") as f:
-        f.write(json_text)
-    ```
+json_text = JsonSerializer().serialize_project(project)
+with open("project.json", "w") as f:
+    f.write(json_text)
+```
 
-=== "Dict"
+**Dict:**
 
-    ```python
-    from behave_model import DictSerializer
+```python
+from behave_model import DictSerializer
 
-    data = DictSerializer().serialize_project(project)
-    print(data["features"][0]["name"])
-    ```
+data = DictSerializer().serialize_project(project)
+print(data["features"][0]["name"])
+```
 
-=== "Pretty Print"
+**Pretty Print:**
 
-    ```python
-    from behave_model import PrettyPrinter
+```python
+from behave_model import PrettyPrinter
 
-    printer = PrettyPrinter()
-    for feature in project.features:
-        print(printer.print_feature(feature))
-    ```
+printer = PrettyPrinter()
+for feature in project.features:
+    print(printer.print_feature(feature))
+```
 
 ## 6. Validate
 

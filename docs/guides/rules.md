@@ -198,28 +198,28 @@ print(collector.rules)
 
 Rules are included in all serializers:
 
-=== "JSON"
+**JSON:**
 
-    ```python
-    from behave_model import JsonSerializer
-    import json
+```python
+from behave_model import JsonSerializer
+import json
 
-    data = json.loads(JsonSerializer().serialize_project(project))
-    for f in data["features"]:
-        for r in f.get("rules", []):
-            print(r["name"])
-    ```
+data = json.loads(JsonSerializer().serialize_project(project))
+for f in data["features"]:
+    for r in f.get("rules", []):
+        print(r["name"])
+```
 
-=== "Pretty Print"
+**Pretty Print:**
 
-    ```python
-    from behave_model import PrettyPrinter
+```python
+from behave_model import PrettyPrinter
 
-    printer = PrettyPrinter()
-    text = printer.print_feature(feature)
-    # Rules are printed with proper indentation
-    print(text)
-    ```
+printer = PrettyPrinter()
+text = printer.print_feature(feature)
+# Rules are printed with proper indentation
+print(text)
+```
 
 ## Next steps
 

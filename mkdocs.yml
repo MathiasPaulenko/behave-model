@@ -5,27 +5,15 @@ repo_url: https://github.com/MathiasPaulenko/behave-model
 repo_name: MathiasPaulenko/behave-model
 edit_uri: edit/main/docs/
 
-docs_dir: docs
-
 theme:
   name: material
   features:
-    - navigation.tabs
     - navigation.sections
     - navigation.expand
-    - navigation.indexes
     - navigation.top
-    - navigation.footer
-    - navigation.tracking
     - search.suggest
     - search.highlight
-    - search.share
     - content.code.copy
-    - content.code.annotate
-    - content.code.select
-    - content.tabs.link
-    - content.tooltips
-    - toc.follow
   palette:
     - scheme: default
       primary: deep purple
@@ -42,10 +30,6 @@ theme:
   font:
     text: Roboto
     code: JetBrains Mono
-  icon:
-    repo: fontawesome/brands/github
-    logo: material/cube-outline
-  favicon: assets/favicon.png
 
 nav:
   - Home: index.md
@@ -71,9 +55,8 @@ nav:
       - Transformations: api/transformations.md
       - Validation: api/validation.md
       - Exceptions: api/exceptions.md
-  - Architecture:
-      - Overview: architecture.md
-      - Design Decisions: design_decisions.md
+  - Architecture: architecture.md
+  - Design Decisions: design_decisions.md
   - Examples: examples.md
   - Changelog: changelog.md
   - Contributing: contributing.md
@@ -88,32 +71,13 @@ markdown_extensions:
           format: !!python/name:pymdownx.superfences.fence_code_format
   - pymdownx.highlight:
       anchor_linenums: true
-      line_spans: __span
-      pygments_lang_class: true
   - pymdownx.inlinehilite
-  - pymdownx.tabbed:
-      alternate_style: true
-  - pymdownx.emoji:
-      emoji_index: !!python/name:material.extensions.emoji.twemoji
-      emoji_generator: !!python/name:material.extensions.emoji.to_svg
-  - pymdownx.snippets
-  - pymdownx.mark
-  - pymdownx.tilde
-  - pymdownx.caret
-  - pymdownx.keys
   - tables
-  - def_list
-  - attr_list
-  - md_in_html
-  - footnotes
   - toc:
       permalink: true
-      toc_depth: 3
 
 plugins:
-  - search:
-      separator: '[\s\-,:!=\[\]()"/]+|(?!\b)(?=[A-Z][a-z])'
-  - tags
+  - search
 
 extra:
   social:
@@ -121,9 +85,3 @@ extra:
       link: https://github.com/MathiasPaulenko/behave-model
     - icon: fontawesome/brands/python
       link: https://pypi.org/project/behave-model/
-  status:
-    new: New in v1.0.0
-    deprecated: Deprecated
-
-extra_css:
-  - assets/extra.css
