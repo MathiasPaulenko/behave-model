@@ -2,14 +2,12 @@
 
 from __future__ import annotations
 
-from pathlib import Path
-
 import pytest
 
 from behave_model.exceptions import ParseError
 from behave_model.parser.adapter import BehaveParserAdapter
 from behave_model.parser.loader import load_feature, load_project
-from behave_model.parser.parser import parse_feature, parse_project
+from behave_model.parser.parser import parse_feature
 
 
 class TestParseFeature:
@@ -49,7 +47,9 @@ class TestAdapter:
         assert f.tags[1].name == "@api"
 
     def test_adapt_background(self):
-        text = "Feature: Test\n  Background:\n    Given a setup\n  Scenario: S1\n    When an action\n"
+        text = (
+            "Feature: Test\n  Background:\n    Given a setup\n  Scenario: S1\n    When an action\n"
+        )
         bf = parse_feature(text, filename="test.feature")
         adapter = BehaveParserAdapter()
         f = adapter.adapt_feature(bf, filename="test.feature")

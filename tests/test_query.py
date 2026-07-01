@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-from behave_model.model import Feature, Project, Scenario, Step, Tag
 from behave_model.queries import (
     find_feature,
     find_features_with_tag,

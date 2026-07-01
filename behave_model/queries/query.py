@@ -14,7 +14,6 @@ from behave_model.model.scenario_outline import ScenarioOutline
 from behave_model.model.step import Step
 from behave_model.model.tag import Tag
 
-
 # -- standalone functions ----------------------------------------------------
 
 

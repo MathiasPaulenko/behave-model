@@ -32,7 +32,7 @@ class Background:
     def __len__(self) -> int:
         return len(self.steps)
 
-    def accept(self, visitor: "Visitor") -> None:
+    def accept(self, visitor: Visitor) -> None:
         """Accept a visitor."""
         visitor.visit_background(self)
         for step in self.steps:

@@ -40,9 +40,7 @@ class DictSerializer:
             "language": feature.language,
             "tags": [self.serialize_tag(t) for t in feature.tags],
             "background": (
-                self.serialize_background(feature.background)
-                if feature.background
-                else None
+                self.serialize_background(feature.background) if feature.background else None
             ),
             "scenarios": [self._serialize_scenario(s) for s in feature.scenarios],
             "rules": [self.serialize_rule(r) for r in feature.rules],
@@ -56,11 +54,7 @@ class DictSerializer:
             "name": rule.name,
             "description": rule.description,
             "tags": [self.serialize_tag(t) for t in rule.tags],
-            "background": (
-                self.serialize_background(rule.background)
-                if rule.background
-                else None
-            ),
+            "background": (self.serialize_background(rule.background) if rule.background else None),
             "scenarios": [self._serialize_scenario(s) for s in rule.scenarios],
             "comments": [self.serialize_comment(c) for c in rule.comments],
             "location": self.serialize_location(rule.location),
@@ -116,12 +110,8 @@ class DictSerializer:
             "type": "step",
             "keyword": step.keyword,
             "name": step.name,
-            "doc_string": (
-                self.serialize_docstring(step.doc_string) if step.doc_string else None
-            ),
-            "data_table": (
-                self.serialize_table(step.data_table) if step.data_table else None
-            ),
+            "doc_string": (self.serialize_docstring(step.doc_string) if step.doc_string else None),
+            "data_table": (self.serialize_table(step.data_table) if step.data_table else None),
             "comments": [self.serialize_comment(c) for c in step.comments],
             "location": self.serialize_location(step.location),
         }

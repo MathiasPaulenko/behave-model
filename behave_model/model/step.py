@@ -49,7 +49,7 @@ class Step:
         """The keyword and name combined."""
         return f"{self.keyword} {self.name}".strip()
 
-    def accept(self, visitor: "Visitor") -> None:
+    def accept(self, visitor: Visitor) -> None:
         """Accept a visitor."""
         visitor.visit_step(self)
 

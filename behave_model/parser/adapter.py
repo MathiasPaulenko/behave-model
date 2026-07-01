@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 from behave_model.model.background import Background
-from behave_model.model.comment import Comment
 from behave_model.model.docstring import DocString
 from behave_model.model.examples import Examples
 from behave_model.model.feature import Feature

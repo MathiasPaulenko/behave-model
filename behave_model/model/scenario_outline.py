@@ -60,7 +60,7 @@ class ScenarioOutline:
                 result.append(row)
         return result
 
-    def accept(self, visitor: "Visitor") -> None:
+    def accept(self, visitor: Visitor) -> None:
         """Accept a visitor."""
         visitor.visit_scenario_outline(self)
         for step in self.steps:

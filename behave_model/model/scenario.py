@@ -49,7 +49,7 @@ class Scenario:
         """Check whether the scenario has a given tag."""
         return any(t.name == name for t in self.tags)
 
-    def accept(self, visitor: "Visitor") -> None:
+    def accept(self, visitor: Visitor) -> None:
         """Accept a visitor."""
         visitor.visit_scenario(self)
         for step in self.steps:

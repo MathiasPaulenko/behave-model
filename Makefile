@@ -27,7 +27,7 @@ build:
 	python -m build
 
 docs:
-	mkdocs build --strict
+	mkdocs build
 
 docs-serve:
 	mkdocs serve

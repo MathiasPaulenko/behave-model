@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 
-from behave_model.model import Feature, Project, Rule, Scenario, Step, Tag
+from behave_model.model import Project, Scenario
 from behave_model.parser.adapter import BehaveParserAdapter
 from behave_model.parser.loader import load_feature, load_project
 from behave_model.parser.parser import parse_feature

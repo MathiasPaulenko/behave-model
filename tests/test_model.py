@@ -40,7 +40,7 @@ class TestLocation:
         loc = Location(filename="a", line=1)
         try:
             loc.line = 2
-            assert False, "Should have raised"
+            raise AssertionError("Should have raised")
         except AttributeError:
             pass
 

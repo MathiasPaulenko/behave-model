@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from behave_model.model import Feature, Project, Scenario, Step, Tag
+from behave_model.model import Feature, Project, Scenario, Tag
 from behave_model.utils import (
     count_by_type,
     feature_filenames,

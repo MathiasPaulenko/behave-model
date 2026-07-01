@@ -39,6 +39,6 @@ class Examples:
         """Data rows from the underlying table."""
         return self.table.rows
 
-    def accept(self, visitor: "Visitor") -> None:
+    def accept(self, visitor: Visitor) -> None:
         """Accept a visitor."""
         visitor.visit_examples(self)

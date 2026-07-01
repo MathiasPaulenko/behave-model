@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
+from collections.abc import Iterator
 from dataclasses import dataclass, field
-from typing import Iterator, Union
 from typing import TYPE_CHECKING
 
 from behave_model.model.background import Background
@@ -18,7 +18,7 @@ if TYPE_CHECKING:
     from behave_model.visitors.visitor import Visitor
 
 # Union type for any scenario-like element
-ScenarioLike = Union[Scenario, ScenarioOutline]
+ScenarioLike = Scenario | ScenarioOutline
 
 
 @dataclass
@@ -102,7 +102,7 @@ class Feature:
             steps.extend(rule.all_steps())
         return steps
 
-    def accept(self, visitor: "Visitor") -> None:
+    def accept(self, visitor: Visitor) -> None:
         """Accept a visitor."""
         visitor.visit_feature(self)
         if self.background:

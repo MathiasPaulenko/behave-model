@@ -5,10 +5,8 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-import pytest
-
 from behave_model.parser.loader import load_feature, load_project
-from behave_model.serializers import DictSerializer, JsonSerializer, PrettyPrinter
+from behave_model.serializers import JsonSerializer, PrettyPrinter
 
 EXAMPLES_DIR = Path(__file__).resolve().parent.parent / "examples"
 
@@ -104,7 +102,6 @@ class TestGoldenProject:
         """Parse -> Print -> Parse should preserve names and counts."""
         project = load_project(EXAMPLES_DIR)
         printer = PrettyPrinter()
-        ser = DictSerializer()
 
         for feature in project.features:
             text = printer.print_feature(feature)

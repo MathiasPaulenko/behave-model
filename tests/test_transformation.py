@@ -86,7 +86,7 @@ class TestSortScenarios:
 
 class TestNormalizeWhitespace:
     def test_normalize_step(self):
-        from behave_model.model import Project, Feature, Scenario, Step
+        from behave_model.model import Feature, Project, Scenario, Step
 
         project = Project(
             features=[

@@ -7,7 +7,7 @@ own Background.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, Union
+from typing import TYPE_CHECKING
 
 from behave_model.model.background import Background
 from behave_model.model.comment import Comment
@@ -19,7 +19,7 @@ from behave_model.model.tag import Tag
 if TYPE_CHECKING:
     from behave_model.visitors.visitor import Visitor
 
-ScenarioLike = Union[Scenario, ScenarioOutline]
+ScenarioLike = Scenario | ScenarioOutline
 
 
 @dataclass
@@ -74,7 +74,7 @@ class Rule:
             steps.extend(s.steps)
         return steps
 
-    def accept(self, visitor: "Visitor") -> None:
+    def accept(self, visitor: Visitor) -> None:
         """Accept a visitor."""
         visitor.visit_rule(self)
         if self.background:

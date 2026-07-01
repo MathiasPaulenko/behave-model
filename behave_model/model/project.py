@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
+from collections.abc import Iterator
 from dataclasses import dataclass, field
-from typing import Iterator
 
 from behave_model.model.background import Background
 from behave_model.model.feature import Feature, ScenarioLike
@@ -112,8 +112,7 @@ class Project:
 
     def _walk_feature_dfs(self, feature: Feature) -> Iterator:
         yield feature
-        for tag in feature.tags:
-            yield tag
+        yield from feature.tags
         if feature.background:
             yield feature.background
             for step in feature.background.steps:
@@ -125,8 +124,7 @@ class Project:
 
     def _walk_rule_dfs(self, rule) -> Iterator:
         yield rule
-        for tag in rule.tags:
-            yield tag
+        yield from rule.tags
         if rule.background:
             yield rule.background
             for step in rule.background.steps:
@@ -136,8 +134,7 @@ class Project:
 
     def _walk_scenario(self, scenario: ScenarioLike) -> Iterator:
         yield scenario
-        for tag in scenario.tags:
-            yield tag
+        yield from scenario.tags
         for step in scenario.steps:
             yield from self._walk_step(step)
         # scenario outline examples

@@ -7,11 +7,8 @@ semantic meaning. Transformations never break the structure of the model.
 from __future__ import annotations
 
 from behave_model.exceptions import TransformationError
-from behave_model.model.feature import Feature
 from behave_model.model.project import Project
-from behave_model.model.scenario import Scenario
 from behave_model.model.scenario_outline import ScenarioOutline
-from behave_model.model.step import Step
 
 
 def rename_tag(project: Project, old_name: str, new_name: str) -> Project:

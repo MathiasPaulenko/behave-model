@@ -6,7 +6,7 @@ The :class:`Validator` runs all registered rules and collects results.
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
 from behave_model.model.project import Project
 
@@ -152,8 +152,7 @@ class InvalidTableRule(ValidationRule):
                     ValidationIssue(
                         rule=self.name,
                         message=(
-                            f"Row {i} has {len(row.cells)} cells "
-                            f"but expected {expected} (headers)"
+                            f"Row {i} has {len(row.cells)} cells but expected {expected} (headers)"
                         ),
                         severity="error",
                         location=loc,
@@ -200,7 +199,7 @@ class Validator:
             DuplicateFeatureNamesRule(),
         ]
 
-    def add_rule(self, rule: ValidationRule) -> "Validator":
+    def add_rule(self, rule: ValidationRule) -> Validator:
         """Add a custom validation rule."""
         self.rules.append(rule)
         return self

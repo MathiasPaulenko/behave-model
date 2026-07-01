@@ -9,7 +9,6 @@ from behave_model.model import (
     Feature,
     Project,
     Scenario,
-    Step,
     Table,
     TableRow,
 )
@@ -65,7 +64,7 @@ class TestValidationRules:
 
     def test_invalid_table(self):
         rule = InvalidTableRule()
-        from behave_model.model.scenario_outline import ScenarioOutline, Examples
+        from behave_model.model.scenario_outline import Examples, ScenarioOutline
 
         project = Project(
             features=[

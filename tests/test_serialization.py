@@ -5,8 +5,6 @@ from __future__ import annotations
 import json
 
 from behave_model.model import (
-    Feature,
-    Project,
     Scenario,
     Step,
     Table,

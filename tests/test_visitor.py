@@ -3,12 +3,8 @@
 from __future__ import annotations
 
 from behave_model.model import (
-    Background,
-    Feature,
     Project,
-    Scenario,
     ScenarioOutline,
-    Step,
     Tag,
 )
 from behave_model.visitors import CollectingVisitor, CountingVisitor, Visitor
