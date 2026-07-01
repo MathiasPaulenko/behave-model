@@ -10,7 +10,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Coverage](https://img.shields.io/badge/coverage-95%25-brightgreen)](https://github.com/MathiasPaulenko/behave-model)
 
-[Documentation](https://mathiaspaulenko.github.io/behave-model/) · [Quick Start](https://mathiaspaulenko.github.io/behave-model/quick_start/) · [API Reference](https://mathiaspaulenko.github.io/behave-model/api_reference/)
+[Documentation](https://mathiaspaulenko.github.io/behave-model/) · [Getting Started](https://mathiaspaulenko.github.io/behave-model/getting-started/quick_start/) · [Guides](https://mathiaspaulenko.github.io/behave-model/guides/domain_model/) · [API Reference](https://mathiaspaulenko.github.io/behave-model/api/overview/)
 
 </div>
 
@@ -69,6 +69,8 @@ for node in project.walk():
     print(type(node).__name__)
 ```
 
+> 📖 **[Full Quick Start guide →](https://mathiaspaulenko.github.io/behave-model/getting-started/quick_start/)**
+
 ## Domain Model
 
 ```text
@@ -96,6 +98,8 @@ Project
 ```
 
 Every node has a `Location` (filename, line, column) for precise source mapping.
+
+> 📖 **[Domain Model guide →](https://mathiaspaulenko.github.io/behave-model/guides/domain_model/)**
 
 ## Features at a Glance
 
@@ -125,6 +129,8 @@ project.accept(visitor)
 print(f"Total steps: {visitor.count}")
 ```
 
+> 📖 **[Visitors guide →](https://mathiaspaulenko.github.io/behave-model/guides/visitors/)**
+
 ### Query API
 
 ```python
@@ -135,6 +141,8 @@ project.find_scenarios(name_contains="login")
 project.find_steps(keyword="Given")
 project.find_steps(text_contains="user")
 ```
+
+> 📖 **[Query API guide →](https://mathiaspaulenko.github.io/behave-model/guides/queries/)**
 
 ### Serialization
 
@@ -151,6 +159,8 @@ data = DictSerializer().serialize_project(project)
 text = PrettyPrinter().print_feature(feature)
 ```
 
+> 📖 **[Serializers guide →](https://mathiaspaulenko.github.io/behave-model/guides/serializers/)**
+
 ### Transformations
 
 ```python
@@ -160,6 +170,8 @@ rename_tag(project, "@smoke", "@critical")
 sort_tags(project)
 normalize_whitespace(project)
 ```
+
+> 📖 **[Transformations guide →](https://mathiaspaulenko.github.io/behave-model/guides/transformations/)**
 
 ### Validation
 
@@ -171,6 +183,8 @@ issues = validator.validate(project)
 for issue in issues:
     print(f"[{issue.severity}] {issue.rule_name}: {issue.message}")
 ```
+
+> 📖 **[Validation guide →](https://mathiaspaulenko.github.io/behave-model/guides/validation/)**
 
 ## Architecture
 
@@ -189,6 +203,8 @@ The Domain Model never depends on report generation or formatting. Each layer ha
 | Transformations | `behave_model.transformations` | Safe in-place modifications |
 | Serializers | `behave_model.serializers` | Dict, JSON, Gherkin output |
 | Validation | `behave_model.validation` | Pluggable rule framework |
+
+> 📖 **[Architecture overview →](https://mathiaspaulenko.github.io/behave-model/architecture/)** · **[Design decisions →](https://mathiaspaulenko.github.io/behave-model/design_decisions/)**
 
 ## Compatibility
 
@@ -230,11 +246,18 @@ make build
 
 ## Documentation
 
-Full documentation is available at [mathiaspaulenko.github.io/behave-model](https://mathiaspaulenko.github.io/behave-model/).
+Full documentation is available at **[mathiaspaulenko.github.io/behave-model](https://mathiaspaulenko.github.io/behave-model/)**.
+
+| Section | Link |
+|---------|------|
+| Getting Started | [Installation](https://mathiaspaulenko.github.io/behave-model/getting-started/installation/) · [Quick Start](https://mathiaspaulenko.github.io/behave-model/getting-started/quick_start/) · [First Project](https://mathiaspaulenko.github.io/behave-model/getting-started/first_project/) |
+| Guides | [Domain Model](https://mathiaspaulenko.github.io/behave-model/guides/domain_model/) · [Gherkin v6 Rules](https://mathiaspaulenko.github.io/behave-model/guides/rules/) · [Visitors](https://mathiaspaulenko.github.io/behave-model/guides/visitors/) · [Queries](https://mathiaspaulenko.github.io/behave-model/guides/queries/) · [Serializers](https://mathiaspaulenko.github.io/behave-model/guides/serializers/) · [Transformations](https://mathiaspaulenko.github.io/behave-model/guides/transformations/) · [Validation](https://mathiaspaulenko.github.io/behave-model/guides/validation/) · [Statistics](https://mathiaspaulenko.github.io/behave-model/guides/statistics/) |
+| API Reference | [Overview](https://mathiaspaulenko.github.io/behave-model/api/overview/) · [Model](https://mathiaspaulenko.github.io/behave-model/api/model/) · [Parser](https://mathiaspaulenko.github.io/behave-model/api/parser/) · [Visitors](https://mathiaspaulenko.github.io/behave-model/api/visitors/) · [Serializers](https://mathiaspaulenko.github.io/behave-model/api/serializers/) · [Transformations](https://mathiaspaulenko.github.io/behave-model/api/transformations/) · [Validation](https://mathiaspaulenko.github.io/behave-model/api/validation/) · [Exceptions](https://mathiaspaulenko.github.io/behave-model/api/exceptions/) |
+| Other | [Architecture](https://mathiaspaulenko.github.io/behave-model/architecture/) · [Design Decisions](https://mathiaspaulenko.github.io/behave-model/design_decisions/) · [Examples](https://mathiaspaulenko.github.io/behave-model/examples/) · [Changelog](https://mathiaspaulenko.github.io/behave-model/changelog/) |
 
 ## Contributing
 
-Contributions are welcome! See [CONTRIBUTING.md](docs/contributing.md) for guidelines.
+Contributions are welcome! See the [Contributing guide](https://mathiaspaulenko.github.io/behave-model/contributing/) for guidelines.
 
 ## License
 
