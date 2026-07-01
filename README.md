@@ -16,7 +16,9 @@
 
 ---
 
-`behave-model` provides a clean, stable, and extensible Python API that represents every element of a Behave project — features, rules, scenarios, steps, tags, tables, docstrings, and more. It is the foundation for an entire ecosystem of tools: formatters, linters, analyzers, report generators, and anything else that needs to understand `.feature` files.
+`behave-model` provides a clean, stable, and extensible Python API that represents every element of a Behave project — features, rules, scenarios, steps, tags, tables, docstrings, and more.
+
+**Why does this exist?** Every Behave tooling project parses `.feature` files independently, duplicating effort and producing inconsistent results. `behave-model` provides a single, well-tested domain model so that tools can depend on it instead of reinventing the parser.
 
 ## Installation
 
