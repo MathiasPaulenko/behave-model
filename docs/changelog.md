@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.1] - 2026-07-02
+
+### Fixed
+- `__version__` was stuck at `0.1.0` — now correctly reports `1.0.1`.
+- README `make docs` command fixed to `make docs-serve` (the actual serve target).
+- Removed non-existent `.pre-commit-config.yaml` from changelog.
+- Replaced hardcoded coverage badge with dynamic Codecov badge.
+
+### Changed
+- Simplified README: removed duplicated content that lives in the documentation site.
+- Simplified MkDocs config: removed Material-specific features (icons, tabs, tooltips)
+  that required extra configuration. Navigation is now sidebar-only.
+- Cleaned all docs: replaced `:material-*:` icons and `===` tabbed sections with
+  plain markdown.
+- Removed empty `docs/assets/` directory.
+
+
 ## [1.0.0] - 2026-07-02
 
 ### Added
