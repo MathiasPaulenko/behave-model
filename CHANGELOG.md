@@ -20,7 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - 31 new tests for Rule support in `tests/test_rules.py`.
 - MkDocs Material documentation site with GitHub Pages deployment.
 - CI/CD workflows: `ci.yml`, `release.yml`, `docs.yml`.
-- `.gitignore`, `.pre-commit-config.yaml`, `tox.ini`, `Makefile`, `conftest.py`.
+- `.gitignore`, `tox.ini`, `Makefile`, `conftest.py`.
 
 ### Changed
 - Tests moved from `behave_model/tests/` to `tests/` at project root.

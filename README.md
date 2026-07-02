@@ -8,7 +8,7 @@
 [![PyPI](https://img.shields.io/pypi/v/behave-model.svg)](https://pypi.org/project/behave-model/)
 [![Python](https://img.shields.io/pypi/pyversions/behave-model.svg)](https://pypi.org/project/behave-model/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Coverage](https://img.shields.io/badge/coverage-95%25-brightgreen)](https://github.com/MathiasPaulenko/behave-model)
+[![Coverage](https://codecov.io/gh/MathiasPaulenko/behave-model/branch/main/graph/badge.svg)](https://codecov.io/gh/MathiasPaulenko/behave-model)
 
 [Documentation](https://mathiaspaulenko.github.io/behave-model/) · [Getting Started](https://mathiaspaulenko.github.io/behave-model/getting-started/quick_start/) · [API Reference](https://mathiaspaulenko.github.io/behave-model/api/overview/) · [Changelog](https://mathiaspaulenko.github.io/behave-model/changelog/)
 
@@ -76,7 +76,7 @@ cd behave-model
 pip install -e ".[dev]"
 make test        # run tests
 make lint        # lint with ruff
-make docs        # serve docs locally
+make docs-serve  # serve docs locally
 ```
 
 ## Contributing
