@@ -7,6 +7,8 @@ standalone through the functions in this module.
 
 from __future__ import annotations
 
+from collections.abc import Iterator
+
 from behave_model.model.feature import Feature, ScenarioLike
 from behave_model.model.project import Project
 from behave_model.model.scenario import Scenario
@@ -34,6 +36,34 @@ def find_tag(project: Project, name: str) -> Tag | None:
     return None
 
 
+def _iter_scenario_contexts(
+    project: Project,
+) -> Iterator[tuple[Feature, object, ScenarioLike]]:
+    """Yield ``(feature, rule_or_None, scenario)`` for every scenario.
+
+    Needed because tag matching must account for inherited tags (feature
+    and rule tags apply to their scenarios, per Gherkin semantics).
+    """
+    for feature in project.features:
+        for s in feature.scenarios:
+            yield feature, None, s
+        for rule in feature.rules:
+            for s in rule.scenarios:
+                yield feature, rule, s
+
+
+def _effective_tag_names(feature: Feature, rule, scenario: ScenarioLike) -> set[str]:
+    """Tags that effectively apply to a scenario (inherited + own + examples)."""
+    names = set(feature.tag_names)
+    if rule is not None:
+        names.update(rule.tag_names)
+    names.update(scenario.tag_names)
+    if isinstance(scenario, ScenarioOutline):
+        for ex in scenario.examples:
+            names.update(t.name for t in ex.tags)
+    return names
+
+
 def find_scenarios(
     project: Project,
     *,
@@ -41,14 +71,23 @@ def find_scenarios(
     name: str | None = None,
     name_contains: str | None = None,
 ) -> list[ScenarioLike]:
-    """Find scenarios by tag, exact name, or name substring."""
+    """Find scenarios by tag, exact name, or name substring.
+
+    The ``tag`` filter matches inherited tags as well: a scenario is
+    returned if the tag is applied to the scenario itself, one of its
+    ``Examples`` blocks, its enclosing rule, or its feature — matching
+    how Behave interprets tag inheritance. ``name`` and ``name_contains``
+    are case-insensitive.
+    """
     results: list[ScenarioLike] = []
-    for s in project.all_scenarios():
-        if tag is not None and not s.has_tag(tag):
+    name_lower = name.lower() if name is not None else None
+    contains_lower = name_contains.lower() if name_contains is not None else None
+    for feature, rule, s in _iter_scenario_contexts(project):
+        if tag is not None and tag not in _effective_tag_names(feature, rule, s):
             continue
-        if name is not None and s.name != name:
+        if name_lower is not None and s.name.lower() != name_lower:
             continue
-        if name_contains is not None and name_contains.lower() not in s.name.lower():
+        if contains_lower is not None and contains_lower not in s.name.lower():
             continue
         results.append(s)
     return results
@@ -77,8 +116,16 @@ def find_features_with_tag(project: Project, tag: str) -> list[Feature]:
 
 
 def find_scenarios_with_tag(project: Project, tag: str) -> list[ScenarioLike]:
-    """Return all scenarios (including outlines) that have a given tag."""
-    return [s for s in project.all_scenarios() if s.has_tag(tag)]
+    """Return all scenarios (including outlines) that have a given tag.
+
+    Inherited tags count: scenarios whose feature, enclosing rule, or
+    ``Examples`` block carries the tag are included.
+    """
+    return [
+        s
+        for feature, rule, s in _iter_scenario_contexts(project)
+        if tag in _effective_tag_names(feature, rule, s)
+    ]
 
 
 def find_outlines(project: Project) -> list[ScenarioOutline]:
@@ -117,7 +164,11 @@ class QueryMixin:
         name: str | None = None,
         name_contains: str | None = None,
     ) -> list[ScenarioLike]:
-        """Find scenarios by tag, exact name, or name substring."""
+        """Find scenarios by tag, exact name, or name substring.
+
+        Tag matching includes tags inherited from the feature, the
+        enclosing rule, and ``Examples`` blocks.
+        """
         return find_scenarios(self, tag=tag, name=name, name_contains=name_contains)
 
     def find_steps(
@@ -134,7 +185,7 @@ class QueryMixin:
         return find_features_with_tag(self, tag)
 
     def find_scenarios_with_tag(self: Project, tag: str) -> list[ScenarioLike]:
-        """Return all scenarios (including outlines) that have a given tag."""
+        """Return all scenarios (including outlines) with a given tag, including inherited tags."""
         return find_scenarios_with_tag(self, tag)
 
     def find_outlines(self: Project) -> list[ScenarioOutline]:
