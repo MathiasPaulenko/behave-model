@@ -26,8 +26,10 @@ class DictSerializer:
             "features": [self.serialize_feature(f) for f in project.features],
             "global_tags": [self.serialize_tag(t) for t in project.global_tags],
             "metadata": {
+                "created_at": project.metadata.created_at.isoformat(),
                 "source_path": project.metadata.source_path,
                 "tool_version": project.metadata.tool_version,
+                "extra": dict(project.metadata.extra),
             },
             "statistics": project.statistics(),
         }
@@ -121,6 +123,7 @@ class DictSerializer:
             "type": "table",
             "headers": list(table.headers),
             "rows": [list(row.cells) for row in table.rows],
+            "row_locations": [self.serialize_location(row.location) for row in table.rows],
             "location": self.serialize_location(table.location),
         }
 
