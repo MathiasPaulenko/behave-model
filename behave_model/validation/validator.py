@@ -48,7 +48,7 @@ class ValidationRule:
 
 
 class DuplicateScenarioNamesRule(ValidationRule):
-    """Detects scenarios with the same name within a feature."""
+    """Detects scenarios with the same name within a feature (case-insensitive)."""
 
     name = "duplicate_scenario_names"
 
@@ -56,8 +56,9 @@ class DuplicateScenarioNamesRule(ValidationRule):
         issues: list[ValidationIssue] = []
         for feature in project.features:
             seen: dict[str, int] = {}
-            for scenario in feature.scenarios:
-                if scenario.name in seen:
+            for scenario in feature.all_scenarios():
+                key = scenario.name.lower()
+                if key in seen:
                     loc = f"{scenario.location.filename}:{scenario.location.line}"
                     issues.append(
                         ValidationIssue(
@@ -70,7 +71,7 @@ class DuplicateScenarioNamesRule(ValidationRule):
                             location=loc,
                         )
                     )
-                seen[scenario.name] = seen.get(scenario.name, 0) + 1
+                seen[key] = seen.get(key, 0) + 1
         return issues
 
 
@@ -82,7 +83,7 @@ class EmptyScenarioRule(ValidationRule):
     def check(self, project: Project) -> list[ValidationIssue]:
         issues: list[ValidationIssue] = []
         for feature in project.features:
-            for scenario in feature.scenarios:
+            for scenario in feature.all_scenarios():
                 if len(scenario.steps) == 0:
                     loc = f"{scenario.location.filename}:{scenario.location.line}"
                     issues.append(
@@ -107,7 +108,7 @@ class EmptyFeatureRule(ValidationRule):
     def check(self, project: Project) -> list[ValidationIssue]:
         issues: list[ValidationIssue] = []
         for feature in project.features:
-            if len(feature.scenarios) == 0:
+            if len(feature.all_scenarios()) == 0:
                 loc = f"{feature.location.filename}:{feature.location.line}"
                 issues.append(
                     ValidationIssue(
@@ -126,21 +127,18 @@ class InvalidTableRule(ValidationRule):
     name = "invalid_table"
 
     def check(self, project: Project) -> list[ValidationIssue]:
+        from behave_model.model.scenario_outline import ScenarioOutline
+
         issues: list[ValidationIssue] = []
         for feature in project.features:
-            for scenario in feature.scenarios:
-                for step in scenario.steps:
-                    if step.data_table:
-                        self._check_table(step.data_table, step, issues)
-                from behave_model.model.scenario_outline import ScenarioOutline
-
+            # all_steps() covers feature/rule backgrounds and rule scenarios
+            for step in feature.all_steps():
+                if step.data_table:
+                    self._check_table(step.data_table, step, issues)
+            for scenario in feature.all_scenarios():
                 if isinstance(scenario, ScenarioOutline):
                     for ex in scenario.examples:
                         self._check_table(ex.table, ex, issues)
-            if feature.background:
-                for step in feature.background.steps:
-                    if step.data_table:
-                        self._check_table(step.data_table, step, issues)
         return issues
 
     def _check_table(self, table, owner, issues: list[ValidationIssue]) -> None:
@@ -169,7 +167,8 @@ class DuplicateFeatureNamesRule(ValidationRule):
         issues: list[ValidationIssue] = []
         seen: dict[str, int] = {}
         for feature in project.features:
-            if feature.name in seen:
+            key = feature.name.lower()
+            if key in seen:
                 loc = f"{feature.location.filename}:{feature.location.line}"
                 issues.append(
                     ValidationIssue(
@@ -179,7 +178,7 @@ class DuplicateFeatureNamesRule(ValidationRule):
                         location=loc,
                     )
                 )
-            seen[feature.name] = seen.get(feature.name, 0) + 1
+            seen[key] = seen.get(key, 0) + 1
         return issues
 
 
@@ -202,6 +201,11 @@ class Validator:
     def add_rule(self, rule: ValidationRule) -> Validator:
         """Add a custom validation rule."""
         self.rules.append(rule)
+        return self
+
+    def remove_rule(self, name: str) -> Validator:
+        """Remove all rules with the given ``name`` (class-level ``name`` attribute)."""
+        self.rules = [r for r in self.rules if r.name != name]
         return self
 
     def validate(self, project: Project) -> list[ValidationIssue]:
