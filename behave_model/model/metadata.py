@@ -6,6 +6,15 @@ from dataclasses import dataclass, field
 from datetime import datetime
 
 
+def _default_tool_version() -> str:
+    """Default to the installed behave-model version (deferred to avoid a circular import)."""
+    try:
+        from behave_model import __version__
+    except ImportError:
+        return "unknown"
+    return __version__
+
+
 @dataclass
 class Metadata:
     """Project-level metadata.
@@ -19,5 +28,5 @@ class Metadata:
 
     created_at: datetime = field(default_factory=datetime.now)
     source_path: str = ""
-    tool_version: str = "0.1.0"
+    tool_version: str = field(default_factory=_default_tool_version)
     extra: dict[str, str] = field(default_factory=dict)
