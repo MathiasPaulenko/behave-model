@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from behave.model import ScenarioOutline as BehaveScenarioOutline
+
 from behave_model.model.background import Background
 from behave_model.model.docstring import DocString
 from behave_model.model.examples import Examples
@@ -123,9 +125,7 @@ class BehaveParserAdapter:
             description = str(desc)
 
         # ScenarioOutline vs Scenario
-        scenario_type = type(behave_scenario).__name__
-
-        if scenario_type == "ScenarioOutline":
+        if isinstance(behave_scenario, BehaveScenarioOutline):
             examples = []
             for behave_ex in behave_scenario.examples:
                 examples.append(self._adapt_examples(behave_ex, filename))

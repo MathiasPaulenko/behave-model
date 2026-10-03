@@ -5,6 +5,7 @@ from __future__ import annotations
 from pathlib import Path
 
 from behave_model.model.feature import Feature
+from behave_model.model.metadata import Metadata
 from behave_model.model.project import Project
 from behave_model.parser.adapter import BehaveParserAdapter
 from behave_model.parser.parser import parse_feature
@@ -22,11 +23,14 @@ def load_feature(path: str | Path, *, language: str | None = None) -> Feature:
 
     Raises:
         FileNotFoundError: If the file does not exist.
+        NotADirectoryError: If ``path`` is a directory, not a file.
         ParseError: If the file cannot be parsed.
     """
     path = Path(path)
     if not path.exists():
         raise FileNotFoundError(f"Feature file not found: {path}")
+    if not path.is_file():
+        raise NotADirectoryError(f"Expected a .feature file, got directory: {path}")
 
     text = path.read_text(encoding="utf-8")
     behave_feature = parse_feature(text, filename=str(path), language=language)
@@ -47,11 +51,14 @@ def load_project(path: str | Path, *, language: str | None = None) -> Project:
 
     Raises:
         FileNotFoundError: If the directory does not exist.
+        NotADirectoryError: If ``path`` is a file, not a directory.
         ParseError: If any file cannot be parsed.
     """
     path = Path(path)
     if not path.exists():
         raise FileNotFoundError(f"Directory not found: {path}")
+    if not path.is_dir():
+        raise NotADirectoryError(f"Expected a directory, got file: {path}")
 
     # Collect all .feature files recursively
     feature_files = sorted(path.rglob("*.feature"))
@@ -75,7 +82,3 @@ def load_project(path: str | Path, *, language: str | None = None) -> Project:
         global_tags=[],
         metadata=Metadata(source_path=str(path)),
     )
-
-
-# Late import to avoid circular dependency
-from behave_model.model.metadata import Metadata  # noqa: E402
