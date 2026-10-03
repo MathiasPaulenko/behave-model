@@ -8,6 +8,7 @@ so you only implement what you care about.
 from __future__ import annotations
 
 from behave_model.model.background import Background
+from behave_model.model.comment import Comment
 from behave_model.model.docstring import DocString
 from behave_model.model.examples import Examples
 from behave_model.model.feature import Feature
@@ -61,6 +62,9 @@ class Visitor:
     def visit_docstring(self, docstring: DocString) -> None:
         """Called when visiting a DocString node."""
 
+    def visit_comment(self, comment: Comment) -> None:
+        """Called when visiting a Comment node."""
+
 
 class CountingVisitor(Visitor):
     """A visitor that counts each node type.
@@ -107,6 +111,9 @@ class CountingVisitor(Visitor):
     def visit_docstring(self, docstring: DocString) -> None:
         self._bump("docstring")
 
+    def visit_comment(self, comment: Comment) -> None:
+        self._bump("comment")
+
 
 class CollectingVisitor(Visitor):
     """A visitor that collects nodes by type.
@@ -119,6 +126,9 @@ class CollectingVisitor(Visitor):
 
     def _collect(self, key: str, node) -> None:
         self.collection.setdefault(key, []).append(node)
+
+    def visit_project(self, project: Project) -> None:
+        self._collect("project", project)
 
     def visit_feature(self, feature: Feature) -> None:
         self._collect("feature", feature)
@@ -140,3 +150,15 @@ class CollectingVisitor(Visitor):
 
     def visit_tag(self, tag: Tag) -> None:
         self._collect("tag", tag)
+
+    def visit_examples(self, examples: Examples) -> None:
+        self._collect("examples", examples)
+
+    def visit_table(self, table: Table) -> None:
+        self._collect("table", table)
+
+    def visit_docstring(self, docstring: DocString) -> None:
+        self._collect("docstring", docstring)
+
+    def visit_comment(self, comment: Comment) -> None:
+        self._collect("comment", comment)

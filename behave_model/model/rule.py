@@ -17,8 +17,10 @@ from behave_model.model.scenario_outline import ScenarioOutline
 from behave_model.model.tag import Tag
 
 if TYPE_CHECKING:
+    from behave_model.model.step import Step
     from behave_model.visitors.visitor import Visitor
 
+# Union type for any scenario-like element
 ScenarioLike = Scenario | ScenarioOutline
 
 
@@ -63,10 +65,8 @@ class Rule:
         """Return all scenario-like elements in this rule."""
         return list(self.scenarios)
 
-    def all_steps(self) -> list:
+    def all_steps(self) -> list[Step]:
         """Return every step in the rule (background + scenarios)."""
-        from behave_model.model.step import Step
-
         steps: list[Step] = []
         if self.background:
             steps.extend(self.background.steps)
@@ -77,7 +77,11 @@ class Rule:
     def accept(self, visitor: Visitor) -> None:
         """Accept a visitor."""
         visitor.visit_rule(self)
+        for tag in self.tags:
+            tag.accept(visitor)
         if self.background:
             self.background.accept(visitor)
         for s in self.scenarios:
             s.accept(visitor)
+        for comment in self.comments:
+            comment.accept(visitor)

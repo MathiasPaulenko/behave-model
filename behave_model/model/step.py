@@ -52,6 +52,12 @@ class Step:
     def accept(self, visitor: Visitor) -> None:
         """Accept a visitor."""
         visitor.visit_step(self)
+        if self.doc_string:
+            self.doc_string.accept(visitor)
+        if self.data_table:
+            self.data_table.accept(visitor)
+        for comment in self.comments:
+            comment.accept(visitor)
 
     def __str__(self) -> str:
         return self.full_text

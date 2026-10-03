@@ -4,8 +4,12 @@ from __future__ import annotations
 
 from collections.abc import Iterator
 from dataclasses import dataclass, field
+from typing import TYPE_CHECKING
 
 from behave_model.model.location import Location
+
+if TYPE_CHECKING:
+    from behave_model.visitors.visitor import Visitor
 
 
 @dataclass
@@ -91,3 +95,7 @@ class Table:
     def to_list_of_dicts(self) -> list[dict[str, str]]:
         """Return all rows as a list of dicts."""
         return list(self.iter_dicts())
+
+    def accept(self, visitor: Visitor) -> None:
+        """Accept a visitor."""
+        visitor.visit_table(self)

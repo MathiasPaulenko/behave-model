@@ -9,16 +9,14 @@ from typing import TYPE_CHECKING
 from behave_model.model.background import Background
 from behave_model.model.comment import Comment
 from behave_model.model.location import Location
-from behave_model.model.rule import Rule
+from behave_model.model.rule import Rule, ScenarioLike
 from behave_model.model.scenario import Scenario
 from behave_model.model.scenario_outline import ScenarioOutline
 from behave_model.model.tag import Tag
 
 if TYPE_CHECKING:
+    from behave_model.model.step import Step
     from behave_model.visitors.visitor import Visitor
-
-# Union type for any scenario-like element
-ScenarioLike = Scenario | ScenarioOutline
 
 
 @dataclass
@@ -89,10 +87,8 @@ class Feature:
                 tags.extend(s.tags)
         return tags
 
-    def all_steps(self):
+    def all_steps(self) -> list[Step]:
         """Return every step in the feature (background + scenarios + rules)."""
-        from behave_model.model.step import Step
-
         steps: list[Step] = []
         if self.background:
             steps.extend(self.background.steps)
@@ -105,9 +101,13 @@ class Feature:
     def accept(self, visitor: Visitor) -> None:
         """Accept a visitor."""
         visitor.visit_feature(self)
+        for tag in self.tags:
+            tag.accept(visitor)
         if self.background:
             self.background.accept(visitor)
         for s in self.scenarios:
             s.accept(visitor)
         for rule in self.rules:
             rule.accept(visitor)
+        for comment in self.comments:
+            comment.accept(visitor)

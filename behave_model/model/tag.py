@@ -2,9 +2,13 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+from typing import TYPE_CHECKING
 
 from behave_model.model.location import Location
+
+if TYPE_CHECKING:
+    from behave_model.visitors.visitor import Visitor
 
 
 @dataclass
@@ -17,7 +21,11 @@ class Tag:
     """
 
     name: str
-    location: Location = Location()
+    location: Location = field(default_factory=Location)
+
+    def accept(self, visitor: Visitor) -> None:
+        """Accept a visitor."""
+        visitor.visit_tag(self)
 
     def __str__(self) -> str:
         return self.name

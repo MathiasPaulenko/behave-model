@@ -52,5 +52,9 @@ class Scenario:
     def accept(self, visitor: Visitor) -> None:
         """Accept a visitor."""
         visitor.visit_scenario(self)
+        for tag in self.tags:
+            tag.accept(visitor)
         for step in self.steps:
             step.accept(visitor)
+        for comment in self.comments:
+            comment.accept(visitor)

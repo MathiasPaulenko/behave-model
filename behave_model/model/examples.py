@@ -6,7 +6,7 @@ from dataclasses import dataclass, field
 from typing import TYPE_CHECKING
 
 from behave_model.model.location import Location
-from behave_model.model.table import Table
+from behave_model.model.table import Table, TableRow
 from behave_model.model.tag import Tag
 
 if TYPE_CHECKING:
@@ -35,10 +35,13 @@ class Examples:
         return self.table.headers
 
     @property
-    def rows(self) -> list:
+    def rows(self) -> list[TableRow]:
         """Data rows from the underlying table."""
         return self.table.rows
 
     def accept(self, visitor: Visitor) -> None:
         """Accept a visitor."""
         visitor.visit_examples(self)
+        for tag in self.tags:
+            tag.accept(visitor)
+        self.table.accept(visitor)
