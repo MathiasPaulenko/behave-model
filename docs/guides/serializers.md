@@ -130,11 +130,10 @@ print(text)
 # Print single feature
 feature_text = printer.print_feature(feature)
 print(feature_text)
-
-# Print single scenario
-scenario_text = printer.print_scenario(scenario)
-print(scenario_text)
 ```
+
+`PrettyPrinter` exposes `print_project` and `print_feature` — the internal
+`_print_*` helpers for scenarios, rules, and tables are private.
 
 ### Output example
 

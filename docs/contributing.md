@@ -17,6 +17,10 @@ This installs `behave-model` with all development dependencies:
 - `mkdocs` and `mkdocs-material` — documentation building
 - `build` and `twine` — package building and validation
 
+The `Makefile` targets assume a POSIX shell (`rm`, `find`). On Windows,
+run the equivalent commands directly — e.g. `python -m pytest tests/`
+instead of `make test`.
+
 ## Running tests
 
 ```bash
@@ -82,9 +86,10 @@ behave-model/
 │   ├── model/             # Domain model classes
 │   ├── parser/            # Parser adapter
 │   ├── visitors/          # Visitor pattern
-│   ├── queries.py         # Query functions
+│   ├── queries/           # Query functions
 │   ├── serializers/       # Dict, JSON, PrettyPrinter
 │   ├── transformations/   # In-place mutations
+│   ├── utils/             # Small utilities (name normalization, ...)
 │   └── validation/        # Validation framework
 ├── tests/                 # Test suite
 ├── examples/              # Example .feature files
@@ -107,8 +112,7 @@ behave-model/
 from behave_model import ValidationRule, ValidationIssue
 
 class MyCustomRule(ValidationRule):
-    name = "MyCustomRule"
-    severity = "warning"
+    name = "my_custom_rule"
 
     def check(self, project):
         issues = []

@@ -26,10 +26,10 @@ from behave_model import Project, Feature
 | `accept(visitor)` | `None` | Accept a visitor |
 | `find_feature(name)` | `Feature \| None` | Find feature by exact name |
 | `find_tag(name)` | `Tag \| None` | Find tag by exact name |
-| `find_scenarios(tag=, name=, name_contains=)` | `list` | Filter scenarios |
+| `find_scenarios(tag=, name=, name_contains=)` | `list` | Filter scenarios (tag matches inherited feature/rule/examples tags; name matching is case-insensitive) |
 | `find_steps(keyword=, text_contains=)` | `list[Step]` | Filter steps |
 | `find_features_with_tag(tag)` | `list[Feature]` | Features with a given tag |
-| `find_scenarios_with_tag(tag)` | `list` | Scenarios with a given tag |
+| `find_scenarios_with_tag(tag)` | `list` | Scenarios with a given tag (including inherited) |
 | `find_outlines()` | `list[ScenarioOutline]` | All Scenario Outlines |
 | `find_plain_scenarios()` | `list[Scenario]` | All plain Scenarios |
 
@@ -61,7 +61,7 @@ Represents a single `.feature` file.
 | `rules` | `list[Rule]` | Gherkin v6 Rule blocks |
 | `language` | `str` | Language code (default `"en"`) |
 | `location` | `Location` | Source location |
-| `comments` | `list[Comment]` | Comments in the feature file |
+| `comments` | `list[Comment]` | Comments (reserved — not populated by the parser yet) |
 
 ### Methods
 
@@ -69,6 +69,9 @@ Represents a single `.feature` file.
 | --- | --- | --- |
 | `all_scenarios()` | `list` | All scenarios including those in Rules |
 | `all_steps()` | `list[Step]` | All steps in the feature |
+| `all_tags()` | `list[Tag]` | All tags (feature, rules, scenarios, examples) |
+| `outlines()` | `list[ScenarioOutline]` | Scenario Outlines (including those in Rules) |
+| `plain_scenarios()` | `list[Scenario]` | Plain Scenarios (including those in Rules) |
 | `has_tag(name)` | `bool` | Check if feature has a tag |
 | `accept(visitor)` | `None` | Accept a visitor |
 
@@ -129,6 +132,7 @@ A concrete scenario with steps.
 | `tag_names` | `list[str]` | Tag names as strings |
 | `steps` | `list[Step]` | Steps |
 | `location` | `Location` | Source location |
+| `comments` | `list[Comment]` | Comments (reserved — not populated by the parser yet) |
 
 ### Methods
 
@@ -141,13 +145,20 @@ A concrete scenario with steps.
 
 ## ScenarioOutline
 
-Extends `Scenario` with Examples for data-driven testing.
+A scenario template with `Examples` for data-driven testing. It shares
+`Scenario`'s attributes but is a sibling class, not a subclass.
 
 ### Additional properties
 
 | Property | Type | Description |
 | --- | --- | --- |
 | `examples` | `list[Examples]` | Examples blocks |
+
+### Methods
+
+| Method | Returns | Description |
+| --- | --- | --- |
+| `expand()` | `list[Scenario]` | One `Scenario` per example row |
 
 ---
 
@@ -159,10 +170,12 @@ A data table attached to a ScenarioOutline.
 
 | Property | Type | Description |
 | --- | --- | --- |
-| `name` | `str \| None` | Optional name |
+| `name` | `str` | Optional name (`""` if unnamed) |
 | `tags` | `list[Tag]` | Examples-level tags |
 | `table` | `Table` | Data table with example rows |
 | `location` | `Location` | Source location |
+| `headers` | `list[str]` | Shortcut to `table.headers` |
+| `rows` | `list[TableRow]` | Shortcut to `table.rows` |
 
 ---
 
@@ -242,7 +255,9 @@ A multi-line text block attached to a step.
 | --- | --- | --- |
 | `content` | `str` | Raw text content |
 | `content_type` | `str` | Content type hint (e.g. `""`, `"json"`) |
+| `delimiter` | `str` | Delimiter used (`'"""'` by default) |
 | `location` | `Location` | Source location |
+| `lines` | `list[str]` | Content split into lines |
 
 ---
 
@@ -262,7 +277,7 @@ Source location for traceability.
 
 ```python
 str(Location(filename="login.feature", line=12))
-# "<login.feature:12>"
+# "login.feature, line 12"
 ```
 
 ---
@@ -282,10 +297,13 @@ A comment line in a feature file.
 
 ## Metadata
 
-Optional metadata attached to model elements.
+Project-level metadata.
 
 ### Properties
 
 | Property | Type | Description |
 | --- | --- | --- |
-| `data` | `dict` | Arbitrary key-value metadata |
+| `created_at` | `datetime` | When the project model was created |
+| `source_path` | `str` | Root path from which the project was loaded |
+| `tool_version` | `str` | Version of behave-model that produced this metadata |
+| `extra` | `dict[str, str]` | Free-form key-value pairs for extensions |

@@ -7,7 +7,8 @@ Gherkin v6 introduced the `Rule` keyword to group related scenarios within a Fea
 A Rule is a logical grouping of scenarios within a Feature. Rules can have:
 
 - Their own `Background` (in addition to the Feature's Background)
-- Their own tags
+- Their own tags (if the parser provides them — Behave attaches tags to the
+  scenario, not the rule, so `rule.tags` is usually empty)
 - Scenarios and Scenario Outlines
 
 ```gherkin
@@ -62,9 +63,12 @@ Feature: User Account Management
     Scenarios: 2
 
   Rule: Password management
-    Tags: ['@security']
+    Tags: []
     Scenarios: 2
 ```
+
+Note that `@security` in the example above is attached to the *scenario*
+`Change password`, not to the rule — so `Tags: []` for both rules.
 
 ## Rule properties
 
@@ -74,8 +78,8 @@ rule = feature.rules[0]
 # Basic properties
 print(rule.name)               # "Profile updates"
 print(rule.description)        # Optional description text
-print(rule.tag_names)          # ["@security"]
-print(rule.location)           # <features/rules.feature:10>
+print(rule.tag_names)          # [] — Behave attaches tags to scenarios, not rules
+print(rule.location)           # "features/rules.feature, line 10"
 
 # Background (Rule-specific)
 if rule.background:
@@ -91,9 +95,9 @@ for scenario in rule.scenarios:
 all_steps = rule.all_steps()
 print(f"Total steps: {len(all_steps)}")
 
-# Check tags
-if rule.has_tag("@security"):
-    print("This rule is security-related")
+# Check tags on scenarios inside the rule
+if rule.scenarios[0].has_tag("@security"):
+    print("This scenario is security-related")
 ```
 
 ## Background inheritance

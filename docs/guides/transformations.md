@@ -9,8 +9,8 @@ Transformations are safe, in-place mutations that preserve the semantic meaning 
 | `rename_tag(project, old, new)` | Rename a tag project-wide |
 | `rename_scenario(project, old, new)` | Rename a scenario |
 | `sort_tags(project)` | Sort tags alphabetically in all elements |
-| `sort_features(project, key=)` | Sort features by name or filename |
-| `sort_scenarios(project)` | Sort scenarios within features |
+| `sort_features(project, key=)` | Sort features by `key="name"` or `key="filename"` |
+| `sort_scenarios(project, key=)` | Sort scenarios within features and rules (`key="name"` or `key="line"`) |
 | `normalize_whitespace(project)` | Normalize whitespace in names and steps |
 | `remove_tag(project, name)` | Remove a tag project-wide |
 | `add_tag_to_feature(project, feature_name, tag)` | Add a tag to a specific feature |
@@ -68,7 +68,7 @@ from behave_model import sort_features
 sort_features(project)
 
 # Sort by filename
-sort_features(project, key=lambda f: f.location.filename)
+sort_features(project, key="filename")
 ```
 
 **Scenarios:**
@@ -146,8 +146,10 @@ for feature in project.features:
     # `original` still has the old tag names
     ```
 
-!!! info "Frozen dataclasses"
-    Model objects are frozen dataclasses, so transformations use `object.__setattr__` internally to modify them. This is safe but means you should always use the transformation functions rather than trying to set attributes directly.
+!!! info "Mutable model"
+    Model objects are plain (mutable) dataclasses, so transformations assign
+    attributes directly. Prefer the transformation functions over manual edits
+    so invariants (e.g. rule-scoped scenarios) are respected.
 
 ## Next steps
 

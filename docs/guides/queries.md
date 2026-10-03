@@ -156,25 +156,24 @@ for feature in project.features:
     print(f"{feature.name}: {total} scenarios")
 ```
 
-### Find unused tags
+### Find untagged scenarios
 
 ```python
-all_tag_names = {t.name for t in project.all_tags()}
-used_tag_names = set()
+for s in project.all_scenarios():
+    if not s.tags:
+        print(f"  Untagged: {s.name}")
+```
 
-for feature in project.features:
-    used_tag_names.update(feature.tag_names)
-    for rule in feature.rules:
-        used_tag_names.update(rule.tag_names)
-    for scenario in feature.scenarios:
-        used_tag_names.update(scenario.tag_names)
-    for rule in feature.rules:
-        for scenario in rule.scenarios:
-            used_tag_names.update(scenario.tag_names)
+### Find scenarios lacking an effective tag
 
-unused = all_tag_names - used_tag_names
-if unused:
-    print(f"Unused tags: {unused}")
+`find_scenarios(tag=...)` matches inherited tags, so the inverse finds
+scenarios with no tag at any level:
+
+```python
+tagged = {id(s) for s in project.find_scenarios(tag="@regression")}
+for s in project.all_scenarios():
+    if id(s) not in tagged:
+        print(f"  Not in @regression: {s.name}")
 ```
 
 ### Find duplicate scenario names

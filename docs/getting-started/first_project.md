@@ -104,7 +104,8 @@ for feature in project.features:
 ## Step 3: Query by tag
 
 ```python
-# Find all scenarios tagged @smoke
+# Find all scenarios tagged @smoke — feature-level tags are inherited,
+# so every scenario in the @smoke Login feature matches
 print("Smoke scenarios:")
 for s in project.find_scenarios(tag="@smoke"):
     print(f"  {s.name}")
@@ -120,6 +121,8 @@ Output:
 ```text
 Smoke scenarios:
   Successful login
+  Failed login with wrong password
+  Login with role <role>
 
 API scenarios:
   Login with role <role>
@@ -149,7 +152,7 @@ issues = validator.validate(project)
 
 if issues:
     for issue in issues:
-        print(f"[{issue.severity}] {issue.rule_name}: {issue.message}")
+        print(f"[{issue.severity}] {issue.rule}: {issue.message}")
 else:
     print("No issues found!")
 ```

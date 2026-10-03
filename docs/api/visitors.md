@@ -2,7 +2,7 @@
 
 ## Visitor
 
-Base class for the visitor pattern. Override `visit_*` methods for the node types you care about.
+Base class for the visitor pattern. Override `visit_*` methods for the node types you care about. Traversal is driven by each node's `accept(visitor)` method — the default `visit_*` implementations are no-ops, so only nodes you hook are acted on.
 
 ```python
 from behave_model import Visitor
@@ -14,20 +14,24 @@ class MyVisitor(Visitor):
 
 ### Visit methods
 
-| Method | Called for | Default behavior |
-| --- | --- | --- |
-| `visit_project(project)` | Project | Visits all features |
-| `visit_feature(feature)` | Feature | Visits tags, background, scenarios, rules |
-| `visit_rule(rule)` | Rule | Visits tags, background, scenarios |
-| `visit_background(background)` | Background | Visits steps |
-| `visit_scenario(scenario)` | Scenario | Visits tags and steps |
-| `visit_scenario_outline(outline)` | ScenarioOutline | Visits tags, steps, examples |
-| `visit_examples(examples)` | Examples | Visits table |
-| `visit_step(step)` | Step | Visits table, doc_string |
-| `visit_table(table)` | Table | No-op |
-| `visit_table_row(row)` | TableRow | No-op |
-| `visit_doc_string(doc_string)` | DocString | No-op |
-| `visit_tag(tag)` | Tag | No-op |
+| Method | Called for |
+| --- | --- |
+| `visit_project(project)` | Project |
+| `visit_feature(feature)` | Feature |
+| `visit_rule(rule)` | Rule |
+| `visit_background(background)` | Background |
+| `visit_scenario(scenario)` | Scenario |
+| `visit_scenario_outline(outline)` | ScenarioOutline |
+| `visit_examples(examples)` | Examples |
+| `visit_step(step)` | Step |
+| `visit_table(table)` | Table |
+| `visit_docstring(docstring)` | DocString |
+| `visit_tag(tag)` | Tag |
+| `visit_comment(comment)` | Comment |
+
+All default implementations are no-ops. After the `visit_*` call,
+`accept` automatically descends into the node's children (tags, steps,
+tables, docstrings, comments).
 
 ---
 
@@ -61,20 +65,14 @@ from behave_model import CollectingVisitor
 
 collector = CollectingVisitor()
 project.accept(collector)
-print(len(collector.features))
-print(len(collector.scenarios))
-print(len(collector.steps))
-print(len(collector.rules))
+print(len(collector.collection["feature"]))
+print(len(collector.collection["scenario"]))
+print(len(collector.collection["step"]))
+print(len(collector.collection["rule"]))
 ```
 
 ### Properties
 
 | Property | Type | Description |
 | --- | --- | --- |
-| `features` | `list[Feature]` | All features |
-| `scenarios` | `list[Scenario]` | All scenarios |
-| `steps` | `list[Step]` | All steps |
-| `rules` | `list[Rule]` | All rules |
-| `tags` | `list[Tag]` | All tags |
-| `tables` | `list[Table]` | All tables |
-| `backgrounds` | `list[Background]` | All backgrounds |
+| `collection` | `dict[str, list]` | Nodes grouped by type (`"project"`, `"feature"`, `"rule"`, `"background"`, `"scenario"`, `"scenario_outline"`, `"examples"`, `"step"`, `"table"`, `"docstring"`, `"tag"`, `"comment"`) |

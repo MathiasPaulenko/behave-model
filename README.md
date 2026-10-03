@@ -56,7 +56,7 @@ for issue in issues:
 ## Features
 
 - **Gherkin v6** — Full `Rule` keyword support
-- **Domain model** — Pure frozen dataclasses for every Gherkin element
+- **Domain model** — Plain dataclasses for every Gherkin element
 - **Visitor pattern** — DFS/BFS tree traversal with custom visitors
 - **Query API** — Filter by name, tag, keyword, or text content
 - **Serializers** — Dict, JSON, and pretty-printed Gherkin output

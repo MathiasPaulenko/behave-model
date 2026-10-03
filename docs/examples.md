@@ -31,7 +31,7 @@ warnings = [i for i in issues if i.severity == "warning"]
 print(f"  Errors:   {len(errors)}")
 print(f"  Warnings: {len(warnings)}")
 for issue in issues:
-    print(f"    [{issue.severity}] {issue.rule_name}: {issue.message}")
+    print(f"    [{issue.severity}] {issue.rule}: {issue.message}")
 
 # Tag distribution
 print("\n=== Tag Distribution ===")
@@ -164,7 +164,7 @@ if errors:
     print(f"\n❌ {len(errors)} validation errors found:")
     for issue in errors:
         loc = str(issue.location) if issue.location else "unknown"
-        print(f"  [{issue.rule_name}] {issue.message}")
+        print(f"  [{issue.rule}] {issue.message}")
         print(f"    at {loc}")
     sys.exit(1)
 else:

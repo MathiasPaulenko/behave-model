@@ -48,6 +48,10 @@ classDiagram
     class ScenarioOutline {
         +list~Examples~ examples
     }
+    class Examples {
+        +list~Tag~ tags
+        +Table table
+    }
     class Step {
         +str keyword
         +str name
@@ -76,8 +80,12 @@ classDiagram
     Rule --> Tag
     Scenario --> Step
     Scenario --> Tag
-    ScenarioOutline --|> Scenario
+    ScenarioOutline --> Step
+    ScenarioOutline --> Tag
+    ScenarioOutline --> Examples
+    Examples --> Table
     Step --> Table
+    Step --> DocString
 ```
 
 ## Project
@@ -129,7 +137,7 @@ print(feature.language)      # "en"
 print(feature.background)    # Background object or None
 print(len(feature.scenarios))# number of scenarios
 print(len(feature.rules))    # number of Gherkin v6 Rules
-print(feature.location)      # <features/login.feature:1>
+print(feature.location)      # "features/login.feature, line 1"
 ```
 
 ### Properties
@@ -145,7 +153,7 @@ print(feature.location)      # <features/login.feature:1>
 | `rules` | `list[Rule]` | Gherkin v6 Rule blocks |
 | `language` | `str` | Language code (default `"en"`) |
 | `location` | `Location` | Source location (filename, line) |
-| `comments` | `list[Comment]` | Comments in the feature file |
+| `comments` | `list[Comment]` | Comments (reserved — the parser does not populate them yet) |
 
 ## Rule
 
@@ -155,7 +163,7 @@ A Gherkin v6 `Rule` block that groups related scenarios within a Feature.
 rule = feature.rules[0]
 
 print(rule.name)             # "Profile updates"
-print(rule.tag_names)        # ["@security"]
+print(rule.tag_names)        # [] — tags on scenarios inside the rule, not the rule
 print(rule.background)       # Rule-specific Background or None
 print(len(rule.scenarios))   # number of scenarios in the rule
 ```
@@ -202,7 +210,9 @@ for scenario in feature.scenarios:
 
 ## ScenarioOutline
 
-Extends `Scenario` with `Examples` for data-driven testing.
+A data-driven scenario template with `Examples` blocks. It mirrors
+`Scenario`'s interface (same attributes plus `examples`) but is a
+sibling class, not a subclass — use `isinstance` to distinguish them.
 
 ```python
 from behave_model import ScenarioOutline
@@ -225,7 +235,7 @@ step = scenario.steps[0]
 print(step.keyword)       # "Given"
 print(step.name)          # "the user is on the login page"
 print(step.full_text)     # "Given the user is on the login page"
-print(step.location)      # <features/login.feature:12>
+print(step.location)      # "features/login.feature, line 12"
 
 # DocString
 if step.doc_string:
@@ -261,7 +271,7 @@ A label that can be applied to features, rules, and scenarios.
 ```python
 tag = feature.tags[0]
 print(tag.name)             # "@smoke"
-print(tag.location)         # <features/login.feature:1>
+print(tag.location)         # "features/login.feature, line 1"
 ```
 
 ## Location
@@ -273,7 +283,7 @@ loc = feature.location
 print(loc.filename)         # "features/login.feature"
 print(loc.line)             # 1
 print(loc.column)           # 0
-print(str(loc))             # "<features/login.feature:1>"
+print(str(loc))             # "features/login.feature, line 1"
 ```
 
 ## Container protocol
@@ -291,9 +301,11 @@ for scenario in feature:
     print(scenario.name)
 ```
 
-## Frozen dataclasses
+## Mutability
 
-All model classes are frozen dataclasses — attributes cannot be modified after creation:
+Model classes are plain (mutable) dataclasses — attributes can be modified
+directly, which is what the transformation functions do. Only `Location`
+is frozen, since it acts as a shared value object:
 
 ```python
 from behave_model import Location
@@ -302,7 +314,7 @@ loc = Location(filename="a.feature", line=1)
 try:
     loc.line = 2  # raises AttributeError
 except AttributeError:
-    print("Frozen — use transformations instead")
+    print("Frozen")
 ```
 
 ## Next steps

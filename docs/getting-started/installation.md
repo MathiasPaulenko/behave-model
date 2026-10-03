@@ -34,6 +34,7 @@ This installs `behave-model` along with:
 - `pytest` and `pytest-cov` — testing and coverage
 - `ruff` — linting and formatting
 - `mkdocs` and `mkdocs-material` — documentation building
+- `build` and `twine` — package building and validation
 
 ## Verify installation
 

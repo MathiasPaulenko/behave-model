@@ -23,7 +23,7 @@ issues = validator.validate(project)
 
 if issues:
     for issue in issues:
-        print(f"[{issue.severity}] {issue.rule_name}: {issue.message}")
+        print(f"[{issue.severity}] {issue.rule}: {issue.message}")
         if issue.location:
             print(f"  at {issue.location}")
 else:
@@ -33,10 +33,8 @@ else:
 Output:
 
 ```text
-[error] DuplicateScenarioNames: Scenario 'Login' appears 2 times in feature 'Auth'
-  at <features/auth.feature:15>
-[warning] EmptyScenario: Scenario 'Placeholder' has no steps
-  at <features/auth.feature:25>
+[ERROR] duplicate_scenario_names (features/auth.feature:15): Duplicate scenario name 'Login' in feature 'Auth'
+[WARNING] empty_scenario (features/auth.feature:25): Scenario 'Placeholder' has no steps in feature 'Auth'
 ```
 
 ## ValidationIssue
@@ -45,10 +43,10 @@ Each issue contains:
 
 | Field | Type | Description |
 | --- | --- | --- |
-| `rule_name` | `str` | Name of the rule that found the issue |
-| `severity` | `str` | `"error"` or `"warning"` |
+| `rule` | `str` | Name of the rule that found the issue |
 | `message` | `str` | Human-readable description |
-| `location` | `Location \| None` | Source location of the problem |
+| `severity` | `str` | `"error"` or `"warning"` |
+| `location` | `str` | Source location string (e.g. `"file.feature:12"`), or `""` |
 
 ## Custom validation rules
 
@@ -60,18 +58,17 @@ from behave_model import ValidationRule, ValidationIssue, Validator
 class NoGivenInThenRule(ValidationRule):
     """Ensure no Then step contains 'Given' in its text."""
 
-    name = "NoGivenInThen"
-    severity = "error"
+    name = "no_given_in_then"
 
     def check(self, project):
         issues = []
         for step in project.all_steps():
             if step.keyword == "Then" and "Given" in step.name:
                 issues.append(ValidationIssue(
-                    rule_name=self.name,
-                    severity=self.severity,
+                    rule=self.name,
+                    severity="error",
                     message=f"Then step contains 'Given': {step.name}",
-                    location=step.location,
+                    location=str(step.location),
                 ))
         return issues
 
@@ -87,8 +84,7 @@ issues = validator.validate(project)
 class MaxStepsPerScenarioRule(ValidationRule):
     """Ensure scenarios don't exceed a maximum number of steps."""
 
-    name = "MaxStepsPerScenario"
-    severity = "warning"
+    name = "max_steps_per_scenario"
 
     def __init__(self, max_steps=10):
         self.max_steps = max_steps
@@ -98,13 +94,13 @@ class MaxStepsPerScenarioRule(ValidationRule):
         for scenario in project.all_scenarios():
             if len(scenario.steps) > self.max_steps:
                 issues.append(ValidationIssue(
-                    rule_name=self.name,
-                    severity=self.severity,
+                    rule=self.name,
+                    severity="warning",
                     message=(
                         f"Scenario '{scenario.name}' has {len(scenario.steps)} "
                         f"steps (max {self.max_steps})"
                     ),
-                    location=scenario.location,
+                    location=str(scenario.location),
                 ))
         return issues
 
@@ -119,18 +115,17 @@ validator.add_rule(MaxStepsPerScenarioRule(max_steps=8))
 class RequiredTagRule(ValidationRule):
     """Ensure all features have a @regression tag."""
 
-    name = "RequiredFeatureTag"
-    severity = "warning"
+    name = "required_feature_tag"
 
     def check(self, project):
         issues = []
         for feature in project.features:
             if "@regression" not in feature.tag_names:
                 issues.append(ValidationIssue(
-                    rule_name=self.name,
-                    severity=self.severity,
+                    rule=self.name,
+                    severity="warning",
                     message=f"Feature '{feature.name}' missing @regression tag",
-                    location=feature.location,
+                    location=str(feature.location),
                 ))
         return issues
 ```
@@ -165,7 +160,7 @@ errors = [i for i in issues if i.severity == "error"]
 if errors:
     print(f"\n{len(errors)} validation errors found:")
     for issue in errors:
-        print(f"  [{issue.rule_name}] {issue.message}")
+        print(f"  [{issue.rule}] {issue.message}")
     exit(1)
 ```
 

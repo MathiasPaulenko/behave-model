@@ -10,13 +10,13 @@
 
 ---
 
-## 2. Frozen dataclasses
+## 2. Mutable dataclasses
 
-**Decision**: All model classes are frozen dataclasses.
+**Decision**: Model classes are plain (mutable) dataclasses. Only `Location` is frozen.
 
-**Rationale**: Immutability prevents accidental modifications and makes the model safer to share between functions. The `Location` class is also frozen for the same reason.
+**Rationale**: Transformations mutate the model in place, which requires mutable nodes. Keeping the model mutable keeps the transformation code simple and avoids `object.__setattr__` hacks or expensive `dataclasses.replace` chains.
 
-**Trade-off**: Transformations need `object.__setattr__` to modify frozen fields. This is an internal implementation detail that users don't see.
+**Trade-off**: The model is not protected against accidental mutation. `Location` is frozen because it is shared freely and acts as a value object.
 
 ---
 
@@ -24,7 +24,7 @@
 
 **Decision**: Model classes are flat dataclasses, not a deep inheritance hierarchy.
 
-**Rationale**: `ScenarioOutline` extends `Scenario` because they share the same interface. Everything else uses composition (e.g., `Feature` has `rules`, `scenarios`, `tags` — it doesn't inherit from them).
+**Rationale**: `ScenarioOutline` mirrors `Scenario`'s interface (same attributes plus `examples`) but is a sibling class, not a subclass — code distinguishes them with `isinstance` checks. Everything else uses composition (e.g., `Feature` has `rules`, `scenarios`, `tags` — it doesn't inherit from them).
 
 **Trade-off**: Some code duplication between `Feature` and `Rule` (both have `background`, `scenarios`, `tags`). This is preferable to a shared base class that would couple them.
 

@@ -63,15 +63,26 @@ bf = parse_feature('Feature: Test\n  Scenario: S1\n    Given a step\n')
 
 ---
 
-### `parse_project(path)`
+### `parse_project(texts)`
 
-Parse all `.feature` files from a directory. Returns a `Project` with adapted domain objects.
+Parse a mapping of `filename → Gherkin text` using Behave's parser.
+Returns a list of `behave.model.Feature` objects — the raw Behave model,
+not the `behave_model` domain model. To load a directory into the domain
+model, use `load_project` instead.
 
 ```python
 from behave_model import parse_project
 
-project = parse_project("features/")
+behave_features = parse_project({"login.feature": "Feature: ..."})
 ```
+
+| Parameter | Type | Description |
+| --- | --- | --- |
+| `texts` | `dict[str, str]` | Mapping of filename to Gherkin text |
+
+| Returns | Description |
+| --- | --- |
+| `list[behave.model.Feature]` | Behave's native feature objects |
 
 ---
 
@@ -91,11 +102,9 @@ feature = adapter.adapt_feature(bf, filename="test.feature")
 
 | Method | Returns | Description |
 | --- | --- | --- |
-| `adapt_feature(bf, filename=)` | `Feature` | Convert a Behave Feature to behave_model Feature |
-| `adapt_scenario(bs)` | `Scenario \| ScenarioOutline` | Convert a Behave Scenario |
-| `adapt_step(bs)` | `Step` | Convert a Behave Step |
-| `adapt_background(bb)` | `Background` | Convert a Behave Background |
-| `adapt_rule(br)` | `Rule` | Convert a Behave Rule (Gherkin v6) |
-| `adapt_tag(bt)` | `Tag` | Convert a Behave Tag |
-| `adapt_table(bt)` | `Table` | Convert a Behave Table |
-| `adapt_examples(be)` | `Examples` | Convert Behave Examples |
+| `adapt_feature(bf, filename="")` | `Feature` | Convert a Behave Feature to behave_model Feature |
+| `adapt_project(behave_features)` | `list[Feature]` | Convert a list of Behave Features |
+
+The remaining converters (`_adapt_scenario`, `_adapt_step`,
+`_adapt_background`, `_adapt_rule`, `_adapt_tag`, `_adapt_table`,
+`_adapt_examples`) are internal helpers called by `adapt_feature`.

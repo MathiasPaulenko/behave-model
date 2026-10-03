@@ -47,11 +47,12 @@ Wraps Behave's built-in parser and converts results into behave-model domain obj
 
 ### Domain Model (`behave_model.model`)
 
-Pure frozen dataclasses with no external dependencies. Every node has:
+Plain dataclasses with no external dependencies (only `Location` is frozen).
+Nodes have:
 
 - A `Location` (filename, line, column) for traceability
-- An `accept(visitor)` method (for visitable nodes)
-- Container protocol support (`__len__`, `__iter__`, `__getitem__`)
+- An `accept(visitor)` method on visitable nodes
+- Container protocol support (`__len__`, `__iter__`, `__getitem__`) on containers
 
 | Class | Represents |
 | --- | --- |

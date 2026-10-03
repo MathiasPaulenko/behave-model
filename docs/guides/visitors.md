@@ -4,7 +4,7 @@ The visitor pattern lets you traverse the entire domain model tree without coupl
 
 ## How it works
 
-Every visitable node (Project, Feature, Rule, Background, Scenario, ScenarioOutline, Step, Tag, Table, DocString, Examples) implements `accept(visitor)`, which calls the appropriate `visit_*` method on the visitor.
+Every visitable node (Project, Feature, Rule, Background, Scenario, ScenarioOutline, Examples, Step, Tag, Table, DocString, Comment) implements `accept(visitor)`, which calls the appropriate `visit_*` method on the visitor and then descends into its children.
 
 ```mermaid
 graph TD
@@ -53,9 +53,9 @@ class MyVisitor(Visitor):
 | `visit_examples(examples)` | Examples block |
 | `visit_step(step)` | Step |
 | `visit_table(table)` | Table |
-| `visit_table_row(row)` | TableRow |
-| `visit_doc_string(doc_string)` | DocString |
+| `visit_docstring(docstring)` | DocString |
 | `visit_tag(tag)` | Tag |
+| `visit_comment(comment)` | Comment |
 
 ## Built-in visitors
 
@@ -83,10 +83,11 @@ from behave_model import CollectingVisitor
 collector = CollectingVisitor()
 project.accept(collector)
 
-print(f"Features: {len(collector.features)}")
-print(f"Scenarios: {len(collector.scenarios)}")
-print(f"Steps: {len(collector.steps)}")
-print(f"Rules: {len(collector.rules)}")
+print(f"Features: {len(collector.collection['feature'])}")
+print(f"Scenarios: {len(collector.collection['scenario'])}")
+print(f"Steps: {len(collector.collection['step'])}")
+print(f"Rules: {len(collector.collection['rule'])}")
+print(f"Tags: {len(collector.collection['tag'])}")
 ```
 
 ## Custom visitor examples
@@ -148,35 +149,32 @@ for tag, count in analyzer.tag_counts.most_common():
 from behave_model import Visitor
 
 class SimplePrinter(Visitor):
-    def __init__(self):
-        self.indent = 0
-        self.lines = []
+    """Prints a flat outline of the feature tree.
 
-    def _p(self, text):
-        self.lines.append("  " * self.indent + text)
+    There are no ``visit_*_end`` hooks — `accept` drives a top-down
+    traversal — so track depth differently (e.g., via the parent
+    relationship) if you need nested indentation.
+    """
+
+    def __init__(self):
+        self.lines = []
 
     def visit_feature(self, feature):
         for tag in feature.tags:
-            self._p(tag.name)
-        self._p(f"Feature: {feature.name}")
-        self.indent += 1
+            self.lines.append(tag.name)
+        self.lines.append(f"Feature: {feature.name}")
 
     def visit_rule(self, rule):
-        self._p(f"Rule: {rule.name}")
-        self.indent += 1
+        self.lines.append(f"  Rule: {rule.name}")
 
     def visit_scenario(self, scenario):
-        self._p(f"Scenario: {scenario.name}")
-        self.indent += 1
+        self.lines.append(f"  Scenario: {scenario.name}")
+
+    def visit_scenario_outline(self, outline):
+        self.lines.append(f"  Scenario Outline: {outline.name}")
 
     def visit_step(self, step):
-        self._p(f"{step.keyword} {step.name}")
-
-    def visit_rule_end(self, rule):
-        self.indent -= 1
-
-    def visit_feature_end(self, feature):
-        self.indent -= 1
+        self.lines.append(f"    {step.full_text}")
 
 printer = SimplePrinter()
 project.accept(printer)

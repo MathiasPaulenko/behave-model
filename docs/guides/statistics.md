@@ -23,12 +23,13 @@ print(f"Tags:         {stats['tags']}")
 | --- | --- | --- |
 | `features` | `int` | Total number of features |
 | `scenarios` | `int` | Total scenarios (including those in Rules) |
-| `steps` | `int` | Total steps across all scenarios and backgrounds |
-| `tags` | `int` | Total unique tags in the project |
-| `average_steps_per_scenario` | `float` | Mean steps per scenario |
 | `scenario_outlines` | `int` | Number of Scenario Outlines |
-| `examples` | `int` | Total example rows across all outlines |
 | `rules` | `int` | Number of Gherkin v6 Rules |
+| `steps` | `int` | Total steps across all scenarios and backgrounds |
+| `average_steps_per_scenario` | `float` | Mean steps per scenario |
+| `tags` | `int` | Total unique tags in the project |
+| `total_tag_usages` | `int` | Total tag occurrences (counting duplicates) |
+| `examples` | `int` | Total example rows across all outlines |
 
 ## Detailed breakdown
 
@@ -96,6 +97,8 @@ Tag distribution:
 ## Step keyword distribution
 
 ```python
+from collections import Counter
+
 from behave_model import CountingVisitor
 
 class KeywordStats(CountingVisitor):

@@ -18,7 +18,9 @@ Converts model objects to plain Python dictionaries.
 | `serialize_table(table)` | `dict` | Table as dict |
 | `serialize_tag(tag)` | `dict` | Tag as dict |
 | `serialize_examples(examples)` | `dict` | Examples as dict |
-| `serialize_doc_string(doc_string)` | `dict` | DocString as dict |
+| `serialize_docstring(doc_string)` | `dict` | DocString as dict |
+| `serialize_comment(comment)` | `dict` | Comment as dict |
+| `serialize_location(location)` | `dict` | Location as dict |
 
 ---
 
@@ -32,6 +34,7 @@ Wraps `DictSerializer` and outputs JSON strings.
 | --- | --- | --- |
 | `serialize_project(project)` | `str` | Full project as JSON |
 | `serialize_feature(feature)` | `str` | Feature as JSON |
+| `to_dict(obj)` | `dict` | Convert a `Project` or `Feature` to dict |
 
 ---
 
@@ -45,5 +48,7 @@ Generates valid Gherkin `.feature` file text.
 | --- | --- | --- |
 | `print_project(project)` | `str` | All features as Gherkin text |
 | `print_feature(feature)` | `str` | Single feature as Gherkin text |
-| `print_scenario(scenario)` | `str` | Single scenario as Gherkin text |
-| `print_rule(rule)` | `str` | Single rule as Gherkin text |
+
+Per-element helpers (`_print_scenario`, `_print_rule`, `_print_step`,
+`_print_table`, `_print_examples`) are private and called by
+`print_feature`.
