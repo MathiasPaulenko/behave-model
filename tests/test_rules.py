@@ -260,6 +260,17 @@ class TestRuleQueries:
         assert len(results) == 1
         assert results[0].name == "Change password"
 
+    def test_find_scenarios_inherits_feature_tag(self, rules_project):
+        # @auth is a feature-level tag: all rule scenarios inherit it
+        results = rules_project.find_scenarios(tag="@auth")
+        assert len(results) == 3
+
+    def test_find_scenarios_with_tag_inherits(self, rules_project):
+        from behave_model.queries import find_scenarios_with_tag
+
+        results = find_scenarios_with_tag(rules_project, "@auth")
+        assert len(results) == 3
+
     def test_find_steps_in_rules(self, rules_project):
         results = rules_project.find_steps(keyword="When")
         assert len(results) > 0
@@ -268,3 +279,186 @@ class TestRuleQueries:
         stats = rules_project.statistics()
         assert stats["scenarios"] == 3
         assert stats["steps"] == 8
+        assert stats["rules"] == 2
+        assert stats["scenario_outlines"] == 1
+        assert stats["examples"] == 2
+
+
+class TestRuleTransformations:
+    def test_rename_tag_inside_rule(self, rules_project):
+        from behave_model.transformations import rename_tag
+
+        rename_tag(rules_project, "@security", "@sec")
+        assert rules_project.features[0].rules[1].scenarios[0].has_tag("@sec")
+        assert rules_project.find_tag("@security") is None
+
+    def test_remove_tag_inside_rule(self, rules_project):
+        from behave_model.transformations import remove_tag
+
+        remove_tag(rules_project, "@security")
+        assert rules_project.find_tag("@security") is None
+
+    def test_rename_scenario_inside_rule(self, rules_project):
+        from behave_model.transformations import rename_scenario
+
+        rename_scenario(rules_project, "Update display name", "Rename display name")
+        results = rules_project.find_scenarios(name="Rename display name")
+        assert len(results) == 1
+
+    def test_sort_scenarios_inside_rule(self):
+        from behave_model.model import Feature, Rule, ScenarioOutline
+        from behave_model.transformations import sort_scenarios
+
+        feature = Feature(
+            name="F",
+            rules=[
+                Rule(
+                    name="R",
+                    scenarios=[ScenarioOutline(name="B"), Scenario(name="A")],
+                )
+            ],
+        )
+        project = Project(features=[feature])
+        sort_scenarios(project)
+        assert [s.name for s in feature.rules[0].scenarios] == ["A", "B"]
+
+    def test_sort_scenarios_by_line(self):
+        from behave_model.model import Feature, Location, Rule
+        from behave_model.transformations import sort_scenarios
+
+        feature = Feature(
+            name="F",
+            rules=[
+                Rule(
+                    name="R",
+                    scenarios=[
+                        Scenario(name="B", location=Location(line=5)),
+                        Scenario(name="A", location=Location(line=2)),
+                    ],
+                )
+            ],
+        )
+        project = Project(features=[feature])
+        sort_scenarios(project, key="line")
+        assert [s.name for s in feature.rules[0].scenarios] == ["A", "B"]
+
+    def test_sort_scenarios_invalid_key(self, rules_project):
+        import pytest
+
+        from behave_model.exceptions import TransformationError
+        from behave_model.transformations import sort_scenarios
+
+        with pytest.raises(TransformationError):
+            sort_scenarios(rules_project, key="bogus")
+
+    def test_normalize_whitespace_inside_rule(self):
+        from behave_model.model import Feature, Rule, Step
+        from behave_model.transformations import normalize_whitespace
+
+        feature = Feature(
+            name="F",
+            rules=[
+                Rule(
+                    name="  R ",
+                    scenarios=[Scenario(name="  S ", steps=[Step(keyword="Given", name="  x  ")])],
+                )
+            ],
+        )
+        project = Project(features=[feature])
+        normalize_whitespace(project)
+        rule = feature.rules[0]
+        assert rule.name == "R"
+        assert rule.scenarios[0].name == "S"
+        assert rule.scenarios[0].steps[0].name == "x"
+
+
+class TestRuleValidation:
+    def test_empty_feature_rule_no_false_positive(self, rules_project):
+        from behave_model.validation import EmptyFeatureRule
+
+        issues = EmptyFeatureRule().check(rules_project)
+        assert issues == []
+
+    def test_empty_scenario_inside_rule(self):
+        from behave_model.model import Feature, Rule
+        from behave_model.validation import EmptyScenarioRule
+
+        feature = Feature(name="F", rules=[Rule(name="R", scenarios=[Scenario(name="Empty")])])
+        issues = EmptyScenarioRule().check(Project(features=[feature]))
+        assert len(issues) == 1
+
+    def test_duplicate_scenario_names_across_rules(self):
+        from behave_model.model import Feature, Rule
+        from behave_model.validation import DuplicateScenarioNamesRule
+
+        feature = Feature(
+            name="F",
+            rules=[
+                Rule(name="R1", scenarios=[Scenario(name="Dup")]),
+                Rule(name="R2", scenarios=[Scenario(name="Dup")]),
+            ],
+        )
+        issues = DuplicateScenarioNamesRule().check(Project(features=[feature]))
+        assert len(issues) == 1
+
+    def test_invalid_table_inside_rule(self):
+        from behave_model.model import Feature, Rule, Step, Table, TableRow
+        from behave_model.validation import InvalidTableRule
+
+        feature = Feature(
+            name="F",
+            rules=[
+                Rule(
+                    name="R",
+                    scenarios=[
+                        Scenario(
+                            name="S",
+                            steps=[
+                                Step(
+                                    keyword="Given",
+                                    name="data",
+                                    data_table=Table(
+                                        headers=["a", "b"],
+                                        rows=[TableRow(cells=["1"])],
+                                    ),
+                                )
+                            ],
+                        )
+                    ],
+                )
+            ],
+        )
+        issues = InvalidTableRule().check(Project(features=[feature]))
+        assert len(issues) == 1
+
+
+class TestRuleVisitorHooks:
+    def test_tags_and_tables_visited(self, rules_project):
+        v = CountingVisitor()
+        rules_project.accept(v)
+        # @auth (feature) + @security (rule scenario) = 2 tag visits
+        assert v.counts.get("tag", 0) == 2
+        # one examples table in the outline inside the rule
+        assert v.counts.get("table", 0) == 1
+
+    def test_docstring_visited(self):
+        from behave_model.model import DocString, Feature, Step
+
+        feature = Feature(
+            name="F",
+            scenarios=[
+                Scenario(
+                    name="S",
+                    steps=[Step(keyword="Given", name="x", doc_string=DocString(content="t"))],
+                )
+            ],
+        )
+        v = CountingVisitor()
+        Project(features=[feature]).accept(v)
+        assert v.counts.get("docstring", 0) == 1
+
+    def test_collecting_visitor_collects_tags(self, rules_project):
+        v = CollectingVisitor()
+        rules_project.accept(v)
+        assert len(v.collection.get("tag", [])) == 2
+        assert len(v.collection.get("examples", [])) == 1

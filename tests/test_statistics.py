@@ -46,6 +46,49 @@ class TestStatistics:
         assert stats["tags"] == 2
         assert stats["total_tag_usages"] == 3
 
+    def test_extended_metrics(self):
+        from behave_model.model import (
+            Examples,
+            Rule,
+            ScenarioOutline,
+            Table,
+            TableRow,
+        )
+
+        p = Project(
+            features=[
+                Feature(
+                    name="F1",
+                    rules=[
+                        Rule(
+                            name="R1",
+                            scenarios=[
+                                ScenarioOutline(
+                                    name="O",
+                                    examples=[
+                                        Examples(
+                                            table=Table(
+                                                headers=["x"],
+                                                rows=[
+                                                    TableRow(cells=["1"]),
+                                                    TableRow(cells=["2"]),
+                                                ],
+                                            )
+                                        )
+                                    ],
+                                )
+                            ],
+                        )
+                    ],
+                )
+            ]
+        )
+        stats = p.statistics()
+        assert stats["rules"] == 1
+        assert stats["scenario_outlines"] == 1
+        assert stats["examples"] == 2
+        assert stats["scenarios"] == 1
+
 
 class TestUtils:
     def test_count_by_type(self, sample_project):

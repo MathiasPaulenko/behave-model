@@ -126,6 +126,10 @@ class TestLoadFeature:
         with pytest.raises(FileNotFoundError):
             load_feature("nonexistent.feature")
 
+    def test_directory_instead_of_file(self, examples_dir):
+        with pytest.raises(NotADirectoryError):
+            load_feature(examples_dir)
+
 
 class TestLoadProject:
     def test_load_from_directory(self, examples_dir):
@@ -142,3 +146,7 @@ class TestLoadProject:
     def test_directory_not_found(self):
         with pytest.raises(FileNotFoundError):
             load_project("/nonexistent/path/xyz")
+
+    def test_file_instead_of_directory(self, examples_dir):
+        with pytest.raises(NotADirectoryError):
+            load_project(examples_dir / "login.feature")

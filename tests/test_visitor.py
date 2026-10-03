@@ -98,3 +98,9 @@ class TestTraversal:
         nodes = list(p.walk())
         assert len(nodes) == 1
         assert isinstance(nodes[0], Project)
+
+    def test_walk_invalid_strategy_raises(self, sample_project):
+        import pytest
+
+        with pytest.raises(ValueError, match="Unknown walk strategy"):
+            list(sample_project.walk(strategy="bogus"))

@@ -54,8 +54,19 @@ class TestFindScenarios:
         assert len(results) == 1
         assert results[0].name == "Successful login"
 
+    def test_by_inherited_feature_tag(self, sample_project):
+        # @smoke is on the Login feature, not on the scenarios themselves
+        results = find_scenarios(sample_project, tag="@smoke")
+        names = {s.name for s in results}
+        assert "Successful login" in names
+        assert "Failed login with wrong password" in names
+
     def test_by_name(self, sample_project):
         results = find_scenarios(sample_project, name="Successful login")
+        assert len(results) == 1
+
+    def test_by_name_case_insensitive(self, sample_project):
+        results = find_scenarios(sample_project, name="successful login")
         assert len(results) == 1
 
     def test_by_name_contains(self, sample_project):

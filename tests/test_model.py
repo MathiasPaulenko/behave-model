@@ -111,7 +111,7 @@ class TestTable:
     def test_column_widths(self):
         t = Table(
             headers=["name", "age"],
-            rows=[TableRow(cells=["Alice", "30"]), TableRow(cells="Bob")],
+            rows=[TableRow(cells=["Alice", "30"]), TableRow(cells=["Bob", "25"])],
         )
         widths = t.column_widths()
         assert widths[0] == 5  # "Alice" is longest
@@ -315,7 +315,9 @@ class TestProject:
 
 class TestMetadata:
     def test_default(self):
+        import behave_model
+
         m = Metadata()
         assert m.source_path == ""
-        assert m.tool_version == "0.1.0"
+        assert m.tool_version == behave_model.__version__
         assert m.extra == {}
