@@ -1,8 +1,9 @@
 """High-level query API for searching and filtering domain models.
 
-The query functions are available as methods on :class:`Project` and
-:class:`Feature` via the :class:`QueryMixin`, but can also be used
-standalone through the functions in this module.
+The query functions are available as methods on :class:`Project` via the
+:class:`QueryMixin`, but can also be used standalone through the functions
+in this module. Tag arguments accept names with or without the leading
+``@``.
 """
 
 from __future__ import annotations
@@ -14,7 +15,7 @@ from behave_model.model.project import Project
 from behave_model.model.scenario import Scenario
 from behave_model.model.scenario_outline import ScenarioOutline
 from behave_model.model.step import Step
-from behave_model.model.tag import Tag
+from behave_model.model.tag import Tag, normalize_tag_name
 
 # -- standalone functions ----------------------------------------------------
 
@@ -29,7 +30,8 @@ def find_feature(project: Project, name: str) -> Feature | None:
 
 
 def find_tag(project: Project, name: str) -> Tag | None:
-    """Find a tag by exact name across the entire project."""
+    """Find a tag by exact name across the entire project (``@`` optional)."""
+    name = normalize_tag_name(name)
     for tag in project.all_tags():
         if tag.name == name:
             return tag
@@ -77,9 +79,10 @@ def find_scenarios(
     returned if the tag is applied to the scenario itself, one of its
     ``Examples`` blocks, its enclosing rule, or its feature — matching
     how Behave interprets tag inheritance. ``name`` and ``name_contains``
-    are case-insensitive.
+    are case-insensitive. ``tag`` may be given with or without ``@``.
     """
     results: list[ScenarioLike] = []
+    tag = normalize_tag_name(tag) if tag is not None else None
     name_lower = name.lower() if name is not None else None
     contains_lower = name_contains.lower() if name_contains is not None else None
     for feature, rule, s in _iter_scenario_contexts(project):
@@ -111,7 +114,7 @@ def find_steps(
 
 
 def find_features_with_tag(project: Project, tag: str) -> list[Feature]:
-    """Return all features that have a given tag."""
+    """Return all features that have a given tag (``@`` optional)."""
     return [f for f in project.features if f.has_tag(tag)]
 
 
@@ -119,8 +122,9 @@ def find_scenarios_with_tag(project: Project, tag: str) -> list[ScenarioLike]:
     """Return all scenarios (including outlines) that have a given tag.
 
     Inherited tags count: scenarios whose feature, enclosing rule, or
-    ``Examples`` block carries the tag are included.
+    ``Examples`` block carries the tag are included. ``@`` is optional.
     """
+    tag = normalize_tag_name(tag)
     return [
         s
         for feature, rule, s in _iter_scenario_contexts(project)

@@ -133,17 +133,17 @@ class InvalidTableRule(ValidationRule):
         for feature in project.features:
             # all_steps() covers feature/rule backgrounds and rule scenarios
             for step in feature.all_steps():
-                if step.data_table:
-                    self._check_table(step.data_table, step, issues)
+                if step.data_table is not None:
+                    self._check_table(step.data_table, issues)
             for scenario in feature.all_scenarios():
                 if isinstance(scenario, ScenarioOutline):
                     for ex in scenario.examples:
-                        self._check_table(ex.table, ex, issues)
+                        self._check_table(ex.table, issues)
         return issues
 
-    def _check_table(self, table, owner, issues: list[ValidationIssue]) -> None:
+    def _check_table(self, table, issues: list[ValidationIssue]) -> None:
         expected = len(table.headers)
-        for i, row in enumerate(table.rows):
+        for i, row in enumerate(table.rows, start=1):
             if len(row.cells) != expected:
                 loc = f"{table.location.filename}:{row.location.line}"
                 issues.append(
@@ -199,7 +199,13 @@ class Validator:
         ]
 
     def add_rule(self, rule: ValidationRule) -> Validator:
-        """Add a custom validation rule."""
+        """Add a custom validation rule.
+
+        Raises:
+            TypeError: If ``rule`` is not a :class:`ValidationRule` instance.
+        """
+        if not isinstance(rule, ValidationRule):
+            raise TypeError(f"rule must be a ValidationRule instance, got {type(rule).__name__}")
         self.rules.append(rule)
         return self
 

@@ -11,7 +11,7 @@ from collections.abc import Iterator
 from behave_model.exceptions import TransformationError
 from behave_model.model.project import Project
 from behave_model.model.scenario_outline import ScenarioOutline
-from behave_model.model.tag import Tag
+from behave_model.model.tag import Tag, normalize_tag_name
 
 
 def _tag_lists(project: Project) -> Iterator[list[Tag]]:
@@ -31,24 +31,36 @@ def _tag_lists(project: Project) -> Iterator[list[Tag]]:
 def rename_tag(project: Project, old_name: str, new_name: str) -> Project:
     """Rename a tag throughout the entire project (including inside Rules).
 
+    Tag names may be given with or without the leading ``@``. Tags are
+    replaced (not mutated) so ``Tag`` objects keep a stable identity/hash
+    for code holding references to them.
+
     Args:
         project: The project to transform.
-        old_name: The current tag name (including ``@``).
-        new_name: The new tag name (including ``@``).
+        old_name: The current tag name.
+        new_name: The new tag name.
 
     Returns:
         The same project (mutated in place).
 
     Raises:
-        TransformationError: If old_name and new_name are the same.
+        TransformationError: If old_name and new_name are the same, or no
+            tag with ``old_name`` exists.
     """
+    old_name = normalize_tag_name(old_name)
+    new_name = normalize_tag_name(new_name)
     if old_name == new_name:
         raise TransformationError("Old and new tag names are identical")
 
+    found = False
     for tags in _tag_lists(project):
-        for tag in tags:
+        for i, tag in enumerate(tags):
             if tag.name == old_name:
-                tag.name = new_name
+                tags[i] = Tag(name=new_name, location=tag.location)
+                found = True
+
+    if not found:
+        raise TransformationError(f"No tag named '{old_name}' found")
 
     return project
 
@@ -138,17 +150,22 @@ def normalize_whitespace(project: Project) -> Project:
     for feature in project.features:
         feature.name = collapse(feature.name)
         feature.description = collapse_lines(feature.description)
-        if feature.background:
+        if feature.background is not None:
+            feature.background.name = collapse(feature.background.name)
             normalize_steps(feature.background.steps)
         for rule in feature.rules:
             rule.name = collapse(rule.name)
             rule.description = collapse_lines(rule.description)
-            if rule.background:
+            if rule.background is not None:
+                rule.background.name = collapse(rule.background.name)
                 normalize_steps(rule.background.steps)
         for scenario in feature.all_scenarios():
             scenario.name = collapse(scenario.name)
             scenario.description = collapse_lines(scenario.description)
             normalize_steps(scenario.steps)
+            if isinstance(scenario, ScenarioOutline):
+                for ex in scenario.examples:
+                    ex.name = collapse(ex.name)
     return project
 
 
@@ -179,9 +196,12 @@ def sort_scenarios(project: Project, *, key: str = "name") -> Project:
 def remove_tag(project: Project, tag_name: str) -> Project:
     """Remove all occurrences of a tag from the project (including inside Rules).
 
+    ``tag_name`` may be given with or without the leading ``@``.
+
     Returns:
         The same project (mutated in place).
     """
+    tag_name = normalize_tag_name(tag_name)
     for tags in _tag_lists(project):
         tags[:] = [t for t in tags if t.name != tag_name]
     return project
