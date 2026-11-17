@@ -8,7 +8,7 @@ from typing import TYPE_CHECKING
 from behave_model.model.comment import Comment
 from behave_model.model.location import Location
 from behave_model.model.step import Step
-from behave_model.model.tag import Tag
+from behave_model.model.tag import Tag, normalize_tag_name
 
 if TYPE_CHECKING:
     from behave_model.visitors.visitor import Visitor
@@ -46,7 +46,8 @@ class Scenario:
         return [t.name for t in self.tags]
 
     def has_tag(self, name: str) -> bool:
-        """Check whether the scenario has a given tag."""
+        """Check whether the scenario has a given tag (``@`` optional)."""
+        name = normalize_tag_name(name)
         return any(t.name == name for t in self.tags)
 
     def accept(self, visitor: Visitor) -> None:

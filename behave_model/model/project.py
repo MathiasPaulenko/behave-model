@@ -79,7 +79,8 @@ class Project:
         tags = self.all_tags()
         scenarios_count = len(scenarios)
         steps_count = len(steps)
-        avg_steps = (steps_count / scenarios_count) if scenarios_count else 0.0
+        scenario_steps = sum(len(s.steps) for s in scenarios)
+        avg_steps = (scenario_steps / scenarios_count) if scenarios_count else 0.0
         unique_tags = {t.name for t in tags}
         outlines = [s for s in scenarios if isinstance(s, ScenarioOutline)]
         rules_count = sum(len(f.rules) for f in self.features)
@@ -101,6 +102,8 @@ class Project:
     def accept(self, visitor: Visitor) -> None:
         """Accept a visitor."""
         visitor.visit_project(self)
+        for tag in self.global_tags:
+            tag.accept(visitor)
         for f in self.features:
             f.accept(visitor)
 
@@ -111,30 +114,30 @@ class Project:
             strategy: ``"dfs"`` for depth-first (default) or ``"bfs"``
                 for breadth-first.
 
+        Returns:
+            An iterator over every node in the tree (Project, Tag, Feature,
+            Background, Rule, Scenario, ScenarioOutline, Examples, Step,
+            Table, DocString, Comment), in the same order ``accept()`` uses.
+
         Raises:
             ValueError: If ``strategy`` is not ``"dfs"`` or ``"bfs"``.
-
-        Yields:
-            Every node in the tree (Project, Feature, Background, Scenario,
-            ScenarioOutline, Examples, Step, Table, DocString, Tag, Comment).
         """
         if strategy == "dfs":
-            yield from self._walk_dfs()
-        elif strategy == "bfs":
-            yield from self._walk_bfs()
-        else:
-            raise ValueError(f"Unknown walk strategy: {strategy!r} (expected 'dfs' or 'bfs')")
+            return self._walk_dfs()
+        if strategy == "bfs":
+            return self._walk_bfs()
+        raise ValueError(f"Unknown walk strategy: {strategy!r} (expected 'dfs' or 'bfs')")
 
     def _walk_dfs(self) -> Iterator:
         yield self
+        yield from self.global_tags
         for feature in self.features:
             yield from self._walk_feature_dfs(feature)
 
     def _walk_feature_dfs(self, feature: Feature) -> Iterator:
         yield feature
         yield from feature.tags
-        yield from feature.comments
-        if feature.background:
+        if feature.background is not None:
             yield feature.background
             for step in feature.background.steps:
                 yield from self._walk_step(step)
@@ -142,35 +145,37 @@ class Project:
             yield from self._walk_scenario(scenario)
         for rule in feature.rules:
             yield from self._walk_rule_dfs(rule)
+        yield from feature.comments
 
     def _walk_rule_dfs(self, rule) -> Iterator:
         yield rule
         yield from rule.tags
-        yield from rule.comments
-        if rule.background:
+        if rule.background is not None:
             yield rule.background
             for step in rule.background.steps:
                 yield from self._walk_step(step)
         for scenario in rule.scenarios:
             yield from self._walk_scenario(scenario)
+        yield from rule.comments
 
     def _walk_scenario(self, scenario: ScenarioLike) -> Iterator:
         yield scenario
         yield from scenario.tags
-        yield from scenario.comments
         for step in scenario.steps:
             yield from self._walk_step(step)
         if isinstance(scenario, ScenarioOutline):
             for ex in scenario.examples:
                 yield ex
                 yield from ex.tags
-                yield ex.table
+                if ex.table is not None:
+                    yield ex.table
+        yield from scenario.comments
 
     def _walk_step(self, step: Step) -> Iterator:
         yield step
-        if step.doc_string:
+        if step.doc_string is not None:
             yield step.doc_string
-        if step.data_table:
+        if step.data_table is not None:
             yield step.data_table
         yield from step.comments
 
@@ -183,10 +188,10 @@ class Project:
 
     def _children(self, node) -> list:
         if isinstance(node, Project):
-            return list(node.features)
+            return [*node.global_tags, *node.features]
         if isinstance(node, Feature):
             children: list = list(node.tags)
-            if node.background:
+            if node.background is not None:
                 children.append(node.background)
             children.extend(node.scenarios)
             children.extend(node.rules)
@@ -196,7 +201,7 @@ class Project:
             return list(node.steps)
         if isinstance(node, Rule):
             children = list(node.tags)
-            if node.background:
+            if node.background is not None:
                 children.append(node.background)
             children.extend(node.scenarios)
             children.extend(node.comments)
@@ -209,12 +214,12 @@ class Project:
             children.extend(node.comments)
             return children
         if isinstance(node, Examples):
-            return [*node.tags, node.table]
+            return [*node.tags, node.table] if node.table is not None else list(node.tags)
         if isinstance(node, Step):
             children = []
-            if node.doc_string:
+            if node.doc_string is not None:
                 children.append(node.doc_string)
-            if node.data_table:
+            if node.data_table is not None:
                 children.append(node.data_table)
             children.extend(node.comments)
             return children

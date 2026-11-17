@@ -13,7 +13,7 @@ from behave_model.model.scenario import Scenario
 from behave_model.model.scenario_outline import ScenarioOutline
 from behave_model.model.step import Step
 from behave_model.model.table import Table, TableRow
-from behave_model.model.tag import Tag
+from behave_model.model.tag import Tag, normalize_tag_name
 
 __all__ = [
     "Background",
@@ -31,4 +31,5 @@ __all__ = [
     "Table",
     "TableRow",
     "Tag",
+    "normalize_tag_name",
 ]

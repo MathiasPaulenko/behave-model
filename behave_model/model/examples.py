@@ -29,6 +29,12 @@ class Examples:
     table: Table = field(default_factory=Table)
     location: Location = field(default_factory=Location)
 
+    def __post_init__(self) -> None:
+        # ``table`` is non-optional in this model: a missing table becomes
+        # an empty one so consumers never have to None-check it.
+        if self.table is None:
+            self.table = Table()
+
     @property
     def headers(self) -> list[str]:
         """Column headers from the underlying table."""

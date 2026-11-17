@@ -52,9 +52,9 @@ class Step:
     def accept(self, visitor: Visitor) -> None:
         """Accept a visitor."""
         visitor.visit_step(self)
-        if self.doc_string:
+        if self.doc_string is not None:
             self.doc_string.accept(visitor)
-        if self.data_table:
+        if self.data_table is not None:
             self.data_table.accept(visitor)
         for comment in self.comments:
             comment.accept(visitor)

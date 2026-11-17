@@ -12,7 +12,7 @@ from behave_model.model.location import Location
 from behave_model.model.rule import Rule, ScenarioLike
 from behave_model.model.scenario import Scenario
 from behave_model.model.scenario_outline import ScenarioOutline
-from behave_model.model.tag import Tag
+from behave_model.model.tag import Tag, normalize_tag_name
 
 if TYPE_CHECKING:
     from behave_model.model.step import Step
@@ -47,10 +47,10 @@ class Feature:
     language: str = "en"
 
     def __iter__(self) -> Iterator[ScenarioLike]:
-        return iter(self.scenarios)
+        return iter(self.all_scenarios())
 
     def __len__(self) -> int:
-        return len(self.scenarios)
+        return len(self.all_scenarios())
 
     @property
     def tag_names(self) -> list[str]:
@@ -58,7 +58,8 @@ class Feature:
         return [t.name for t in self.tags]
 
     def has_tag(self, name: str) -> bool:
-        """Check whether the feature has a given tag."""
+        """Check whether the feature has a given tag (``@`` optional)."""
+        name = normalize_tag_name(name)
         return any(t.name == name for t in self.tags)
 
     def outlines(self) -> list[ScenarioOutline]:
@@ -90,7 +91,7 @@ class Feature:
     def all_steps(self) -> list[Step]:
         """Return every step in the feature (background + scenarios + rules)."""
         steps: list[Step] = []
-        if self.background:
+        if self.background is not None:
             steps.extend(self.background.steps)
         for s in self.scenarios:
             steps.extend(s.steps)
@@ -103,7 +104,7 @@ class Feature:
         visitor.visit_feature(self)
         for tag in self.tags:
             tag.accept(visitor)
-        if self.background:
+        if self.background is not None:
             self.background.accept(visitor)
         for s in self.scenarios:
             s.accept(visitor)
