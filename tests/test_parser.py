@@ -127,7 +127,7 @@ class TestLoadFeature:
             load_feature("nonexistent.feature")
 
     def test_directory_instead_of_file(self, examples_dir):
-        with pytest.raises(NotADirectoryError):
+        with pytest.raises(IsADirectoryError):
             load_feature(examples_dir)
 
 
