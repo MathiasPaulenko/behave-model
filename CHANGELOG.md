@@ -5,6 +5,81 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.1] - 2026-10-04
+
+### Fixed
+- `parse_feature`/`load_feature`/`load_project` now raise `ParseError`
+  (instead of crashing with `AttributeError`) for empty files,
+  whitespace-only input, and comment-only files — Behave returns `None`
+  for featureless text and the adapter no longer dereferences it.
+- UTF-8 BOM is stripped before parsing; feature files are read with
+  `utf-8-sig`, so BOM-prefixed files parse correctly instead of failing
+  with "No feature found".
+- `Examples:` blocks without a table no longer crash the adapter; the
+  model keeps the invariant `Examples.table` is always a `Table`
+  (`None` is normalized to an empty `Table` in `__post_init__`).
+- `load_project` skips directories named `*.feature` instead of crashing
+  on `read_text`.
+- `load_feature` raises `IsADirectoryError` (was `NotADirectoryError`,
+  which means the opposite) and `OSError` for non-regular files;
+  undecodable files raise `ParseError` instead of raw `UnicodeError`.
+- Empty-but-present nodes are no longer silently dropped: `Background`
+  with no steps, `Table` with no rows, and empty `DocString`s were falsy
+  via `__len__` and were skipped by traversal, visitors, serialization,
+  pretty printing, and `normalize_whitespace`. All presence checks now
+  use `is not None`.
+- `Project.accept()` and `Project.walk()` (DFS and BFS) now visit
+  `project.global_tags` — they were invisible to every visitor before.
+- DFS walk order now matches `accept()`/BFS child order (comments are
+  yielded after a node's other children instead of first).
+- `walk(strategy=...)` raises `ValueError` eagerly at call time instead
+  of only when the generator is consumed.
+- `Feature.__iter__`/`__len__` use `all_scenarios()` — a feature with
+  only rule scenarios was falsy/empty before.
+- `statistics()["average_steps_per_scenario"]` counts scenario-defined
+  steps only; background steps no longer inflate the average.
+- Tag names are normalized to include `@` at API boundaries:
+  `Tag(name="smoke")` becomes `"@smoke"`, and `has_tag`, `find_tag`,
+  `find_scenarios(tag=)`, `find_scenarios_with_tag`,
+  `find_features_with_tag`, `remove_tag`, `rename_tag`, and
+  `add_tag_to_feature` all accept names with or without `@`.
+- `rename_tag` raises `TransformationError` when the tag does not exist
+  (consistent with `rename_scenario`) and replaces `Tag` objects instead
+  of mutating `tag.name`, so tags stored in sets/dicts are not corrupted.
+- `normalize_whitespace` now also normalizes `Background.name` and
+  `Examples.name`.
+- `PrettyPrinter` no longer emits a phantom `|  |` header row for
+  headerless tables, and switches the docstring delimiter to ` ``` ` when
+  the content contains a literal `"""` line so the docstring is not
+  closed early.
+- `PrettyPrinter` prints non-English features with a `# language:` header
+  and localized keywords (from Behave's i18n table), so printed output
+  parses back to an equivalent model — previously it produced mixed
+  English/non-English Gherkin that failed to parse in any language.
+- `JsonSerializer.to_dict` dispatches every domain type (was: only
+  `Project` and `Feature`).
+- `Validator.add_rule` raises `TypeError` for objects that are not
+  `ValidationRule` instances instead of accepting them silently.
+- `InvalidTableRule` reports rows 1-based in messages and no longer
+  takes an unused `owner` parameter.
+- `Table`/`docstring` source locations: `Table.location.line` now uses
+  Behave's own line number, and docstring locations point at the
+  delimiter line (`step.line + 1`).
+- `parse_feature` raises `TypeError` for non-string input instead of an
+  opaque Behave error.
+
+### Added
+- `py.typed` marker so type checkers pick up the package's type hints
+  (PEP 561).
+- `behave_model.model.normalize_tag_name` helper for consistent tag
+  normalization.
+- 40 regression tests covering all of the above.
+
+### Documentation
+- `find_feature`/`find_tag` descriptions now say case-insensitive /
+  `@`-optional matching.
+
+
 ## [1.1.0] - 2026-10-03
 
 ### Added
