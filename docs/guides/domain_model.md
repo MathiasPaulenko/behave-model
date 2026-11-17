@@ -115,8 +115,8 @@ for f in project:   # iterate features
 | `statistics()` | `dict` | Project metrics (features, scenarios, steps, tags, averages) |
 | `walk(strategy="dfs")` | `Iterator` | Traverse the entire tree (DFS or BFS) |
 | `accept(visitor)` | `None` | Accept a visitor |
-| `find_feature(name)` | `Feature \| None` | Find feature by exact name |
-| `find_tag(name)` | `Tag \| None` | Find tag by exact name |
+| `find_feature(name)` | `Feature \| None` | Find feature by name (case-insensitive) |
+| `find_tag(name)` | `Tag \| None` | Find tag by name (`@` optional) |
 | `find_scenarios(...)` | `list` | Filter scenarios by tag, name, or name_contains |
 | `find_steps(...)` | `list[Step]` | Filter steps by keyword or text_contains |
 | `find_features_with_tag(tag)` | `list[Feature]` | Features that have a given tag |

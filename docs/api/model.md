@@ -24,8 +24,8 @@ from behave_model import Project, Feature
 | `statistics()` | `dict` | Project metrics |
 | `walk(strategy="dfs")` | `Iterator` | Traverse the entire tree (DFS or BFS) |
 | `accept(visitor)` | `None` | Accept a visitor |
-| `find_feature(name)` | `Feature \| None` | Find feature by exact name |
-| `find_tag(name)` | `Tag \| None` | Find tag by exact name |
+| `find_feature(name)` | `Feature \| None` | Find feature by name (case-insensitive) |
+| `find_tag(name)` | `Tag \| None` | Find tag by name (`@` optional) |
 | `find_scenarios(tag=, name=, name_contains=)` | `list` | Filter scenarios (tag matches inherited feature/rule/examples tags; name matching is case-insensitive) |
 | `find_steps(keyword=, text_contains=)` | `list[Step]` | Filter steps |
 | `find_features_with_tag(tag)` | `list[Feature]` | Features with a given tag |
