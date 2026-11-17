@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from behave.model import ScenarioOutline as BehaveScenarioOutline
 
+from behave_model.exceptions import ParseError
 from behave_model.model.background import Background
 from behave_model.model.docstring import DocString
 from behave_model.model.examples import Examples
@@ -30,6 +31,8 @@ class BehaveParserAdapter:
 
     def adapt_feature(self, behave_feature, *, filename: str = "") -> Feature:
         """Convert a behave.model.Feature into a domain Feature."""
+        if behave_feature is None:
+            raise ParseError("Cannot adapt an empty parse result (no feature found)")
         fname = filename or getattr(behave_feature, "filename", "") or ""
         line = getattr(behave_feature, "line", 0) or 0
         location = Location(filename=fname, line=line)
@@ -48,7 +51,7 @@ class BehaveParserAdapter:
 
         # -- background --
         background = None
-        if behave_feature.background:
+        if behave_feature.background is not None:
             background = self._adapt_background(behave_feature.background, fname)
 
         # -- scenarios (directly under feature) --
@@ -162,7 +165,7 @@ class BehaveParserAdapter:
             description = str(desc)
 
         background = None
-        if getattr(behave_rule, "background", None):
+        if getattr(behave_rule, "background", None) is not None:
             background = self._adapt_background(behave_rule.background, filename)
 
         scenarios = []
@@ -182,7 +185,12 @@ class BehaveParserAdapter:
     def _adapt_examples(self, behave_examples, filename: str) -> Examples:
         line = getattr(behave_examples, "line", 0) or 0
         tags = self._adapt_tags(getattr(behave_examples, "tags", []), filename)
-        table = self._adapt_table(behave_examples.table, filename)
+        # An ``Examples:`` block without a table parses to ``table=None``.
+        table = (
+            self._adapt_table(behave_examples.table, filename)
+            if behave_examples.table is not None
+            else Table()
+        )
         return Examples(
             name=behave_examples.name or "",
             tags=tags,
@@ -195,21 +203,21 @@ class BehaveParserAdapter:
         keyword = behave_step.keyword or ""
         name = behave_step.name or ""
 
-        # docstring (Behave stores it in .text)
+        # docstring (Behave stores it in .text); keep empty docstrings.
         doc_string = None
         step_text = getattr(behave_step, "text", None)
-        if step_text:
+        if step_text is not None:
             doc_string = DocString(
                 content=step_text,
                 content_type="",
                 delimiter='"""',
-                location=Location(filename=filename, line=line),
+                location=Location(filename=filename, line=line + 1),
             )
 
         # data table
         data_table = None
         step_table = getattr(behave_step, "table", None)
-        if step_table:
+        if step_table is not None:
             data_table = self._adapt_table(step_table, filename)
 
         return Step(
@@ -232,8 +240,9 @@ class BehaveParserAdapter:
                     location=Location(filename=filename, line=row_line),
                 )
             )
+        line = getattr(behave_table, "line", 0) or 0
         return Table(
             headers=headers,
             rows=rows,
-            location=Location(filename=filename, line=0),
+            location=Location(filename=filename, line=line),
         )
